@@ -21,7 +21,7 @@
 # n8n container — that image is minimal and has no jq; all JSON work is host-side.
 set -euo pipefail
 
-VERSION="1.0.0"
+VERSION="1.1.0"
 SELF="$(basename "$0")"
 REMOTE=0
 
@@ -35,7 +35,6 @@ load_config() {
   if [ -z "$cfg" ]; then for c in ./.n8n-sync.env ./.env; do [ -f "$c" ] && { cfg="$c"; break; }; done; fi
   [ -n "$cfg" ] && [ -f "$cfg" ] && { set -a; . "$cfg"; set +a; }
   N8N_CONTAINER="${N8N_CONTAINER:-n8n}"
-  N8N_PG_CONTAINER="${N8N_PG_CONTAINER:-n8n-postgres}"
   ACT_KEY="${N8N_API_KEY:-}"
   WORKFLOWS_DIR="${WORKFLOWS_DIR:-workflows}"
   SCOPE_FILE="${SCOPE_FILE:-workflow-ids.json}"
@@ -47,7 +46,14 @@ load_config() {
 
 nexec() { docker exec "$N8N_CONTAINER" "$@"; }
 nsh()   { docker exec "$N8N_CONTAINER" sh -c "$1"; }
-pg()    { docker exec -i "$N8N_PG_CONTAINER" sh -c 'exec psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAF"|"'; }
+
+# --- SQL access. n8n-sync needs raw SQL (folder sync + cycle-safe activation);
+#     n8n exposes neither via its CLI/API. We run it INSIDE the n8n container via
+#     node + the `pg` module bundled in the image, using n8n's OWN DB_POSTGRESDB_*
+#     env. This is the ONE transport that works everywhere — a local pg container,
+#     a managed/EXTERNAL Postgres, queue mode — since the n8n image has no psql and
+#     a separate pg container may not exist. Emulates psql -tAF'|' (see NODE_PG).
+pg() { docker exec -i "$N8N_CONTAINER" node -e "$NODE_PG"; }
 
 scope_ids() { [ -f "$SCOPE_FILE" ] && jq -r '(.workflows // [])[].id' "$SCOPE_FILE" || true; }
 
@@ -91,6 +97,55 @@ const post = (a, body) => fetch(`${base}/workflows/${id}/${a}`, { method: 'POST'
   const w = await get();
   if ((w.active === true) !== want) { console.error('active=' + w.active + ' want=' + want); process.exit(2); }
 })().catch((e) => { console.error(e && e.message); process.exit(3); });
+NODE
+
+# --- node helper: run SQL (read from stdin) against n8n's OWN Postgres from
+#     INSIDE the n8n container, using its DB_POSTGRESDB_* env. Loads the `pg`
+#     module bundled with n8n (the image has no psql). Emulates `psql -tAF'|'`:
+#     tuples only, unaligned, '|' field separator, NULL -> empty string; a
+#     multi-statement script runs in one implicit transaction; any SQL error or
+#     connection failure -> exit 1. This is pg()'s only transport.
+read -r -d '' NODE_PG <<'NODE' || true
+const fs = require('fs'), path = require('path');
+function loadPg() {
+  const tried = [], cands = [];
+  const pnpm = '/usr/local/lib/node_modules/n8n/node_modules/.pnpm';
+  try { for (const e of fs.readdirSync(pnpm)) if (/^pg@\d/.test(e)) cands.push(path.join(pnpm, e, 'node_modules', 'pg')); } catch (e) {}
+  cands.push('pg', '/usr/local/lib/node_modules/n8n/node_modules/pg', '/n8ncicd/node_modules/pg');
+  for (const c of cands) { try { return require(c); } catch (e) { tried.push(c + ':' + e.code); } }
+  throw new Error('no resolvable `pg` module in the n8n image (tried ' + tried.join(', ') + ')');
+}
+const { Client } = loadPg();
+const E = process.env;
+const envFile = (v, f) => { try { return f && fs.existsSync(f) ? fs.readFileSync(f, 'utf8').replace(/\s+$/, '') : v; } catch (e) { return v; } };
+const sslOn = E.DB_POSTGRESDB_SSL_ENABLED === 'true' || !!E.DB_POSTGRESDB_SSL_CA || !!E.DB_POSTGRESDB_SSL_CERT;
+const client = new Client({
+  host: E.DB_POSTGRESDB_HOST || 'localhost',
+  port: parseInt(E.DB_POSTGRESDB_PORT || '5432', 10),
+  user: E.DB_POSTGRESDB_USER || 'postgres',
+  password: String(envFile(E.DB_POSTGRESDB_PASSWORD, E.DB_POSTGRESDB_PASSWORD_FILE) || ''),
+  database: E.DB_POSTGRESDB_DATABASE || E.DB_POSTGRESDB_USER || 'n8n',
+  ssl: sslOn ? { rejectUnauthorized: E.DB_POSTGRESDB_SSL_REJECT_UNAUTHORIZED !== 'false', ca: E.DB_POSTGRESDB_SSL_CA || undefined } : false,
+});
+const cell = (v) => (v === null || v === undefined) ? '' : (typeof v === 'object' ? JSON.stringify(v) : String(v));
+let sql = '';
+process.stdin.setEncoding('utf8');
+process.stdin.on('data', (d) => { sql += d; });
+process.stdin.on('end', async () => {
+  try {
+    await client.connect();
+    const schema = E.DB_POSTGRESDB_SCHEMA;
+    if (schema && schema !== 'public') await client.query('SET search_path TO "' + schema.replace(/"/g, '""') + '", public');
+    if (sql.trim()) {
+      const res = await client.query({ text: sql, rowMode: 'array' });
+      const sets = Array.isArray(res) ? res : [res];
+      const lines = [];
+      for (const r of sets) if (r && r.rows) for (const row of r.rows) lines.push(row.map(cell).join('|'));
+      if (lines.length) process.stdout.write(lines.join('\n') + '\n');
+    }
+    await client.end();
+  } catch (e) { console.error(e && e.message ? e.message : String(e)); process.exit(1); }
+});
 NODE
 
 # ============================================================ normalize ====
@@ -401,10 +456,11 @@ cmd_init() {
 # n8n-sync config — committed? NO. Holds the target API key. Keep it out of git.
 # Values here are sourced by n8n-sync; env vars set before the call also work.
 
-# n8n (main) container name on the TARGET, and its Postgres container.
-# Local and remote should use the SAME names — only the daemon differs.
+# n8n (main) container name on the TARGET. Local and remote should use the SAME
+# name — only the daemon differs. n8n-sync reads the DB creds from THIS container's
+# own DB_POSTGRESDB_* env and runs the folder/activation SQL inside it via node+pg,
+# so no Postgres container name is needed.
 N8N_CONTAINER=n8n
-N8N_PG_CONTAINER=n8n-postgres
 
 # Target's public API key (UI → Settings → n8n API). Enables LIVE activation
 # (triggers register without an n8n restart). Empty -> CLI publish (needs restart).
@@ -453,7 +509,7 @@ COMMANDS
   init               Scaffold this project: $WORKFLOWS_DIR/, $SCOPE_FILE, .n8n-sync.env, .gitignore.
   export             n8n  -> repo. Exports all workflows, normalizes them, mirrors the
                      n8n folder tree as directories, writes $WORKFLOWS_DIR/folders.json.
-  import             repo -> n8n. Id-preserving CLI import; upserts folders (psql);
+  import             repo -> n8n. Id-preserving CLI import; upserts folders (SQL);
                      seeds missing credential stubs; activates (see ACTIVATION).
   normalize [file…]  Canonicalize workflow JSON in place (all under $WORKFLOWS_DIR if none given).
   pull               Safe git pull: export → stash → git pull (3-way merge) → import.
@@ -463,16 +519,22 @@ COMMANDS
 
 CONFIG  (env wins; else \$N8N_SYNC_CONFIG | ./.n8n-sync.env | ./.env)
   N8N_CONTAINER          n8n container on the target            [n8n]
-  N8N_PG_CONTAINER       its Postgres container                 [n8n-postgres]
   N8N_API_KEY            target public API key -> live activate  []
   N8N_REMOTE_DOCKER_HOST ssh://user@host for --remote            []
   WORKFLOWS_DIR          repo dir for workflow JSON + folders.json [workflows]
   SCOPE_FILE             {"workflows":[{id,name}]} limiting sync  [workflow-ids.json]
 
-WHY docker exec + psql
+WHY docker exec + SQL
   The n8n CLI preserves entity ids (the public REST API cannot create-with-id), and
   n8n folders have no CLI/API — only the DB. The SAME command works local or remote;
   only DOCKER_HOST differs. jq runs HOST-side only (the n8n image has no jq).
+
+DATABASE ACCESS
+  Folder sync + cycle-safe activation need raw SQL. n8n-sync runs it INSIDE the n8n
+  container via node + the pg module bundled in the image, using n8n's own
+  DB_POSTGRESDB_* env (honours DB_POSTGRESDB_PASSWORD_FILE, _SSL_*, _SCHEMA). It is
+  the only transport that works everywhere — a local pg container, a managed/
+  EXTERNAL Postgres, queue mode — and needs no psql and no separate pg container.
 
 ACTIVATION (import)
   Credential-aware: a workflow activates only when every credential its enabled nodes
