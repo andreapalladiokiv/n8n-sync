@@ -21,7 +21,7 @@
 # n8n container — that image is minimal and has no jq; all JSON work is host-side.
 set -euo pipefail
 
-VERSION="1.2.0"
+VERSION="1.2.1"
 SELF="$(basename "$0")"
 REMOTE=0
 
@@ -72,7 +72,7 @@ resolve_folder() {
     [ -n "$seg" ] || continue
     if [ -n "$parent" ]; then parentval="'$(sqesc "$parent")'"; pclause="\"parentFolderId\"='$(sqesc "$parent")'"
     else parentval="NULL"; pclause="\"parentFolderId\" IS NULL"; fi
-    id="$(printf "SELECT id FROM folder WHERE \"projectId\"='%s' AND name='%s' AND %s LIMIT 1;\n" \
+    id="$(printf "SELECT id FROM folder WHERE \"projectId\"='%s' AND name='%s' AND %s ORDER BY \"createdAt\",id LIMIT 1;\n" \
             "$(sqesc "$proj")" "$(sqesc "$seg")" "$pclause" | pg)"
     if [ -z "$id" ]; then
       id="$(printf "INSERT INTO folder (id,name,\"projectId\",\"parentFolderId\",\"createdAt\",\"updatedAt\") VALUES ((SELECT string_agg(substr('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789',(floor(random()*62)+1)::int,1),'') FROM generate_series(1,16)),'%s','%s',%s,now(),now()) RETURNING id;\n" \
@@ -81,6 +81,17 @@ resolve_folder() {
     parent="$id"
   done
   printf '%s' "$parent"
+}
+
+# folder_path_of PROJECT FOLDER_ID -> print the folder's "A/B/Leaf" name-path if it
+# lives in PROJECT, else "". Used to KEEP a workflow's existing folder when it
+# already matches the repo path (idempotent; respects a manual placement among
+# several same-name folders) instead of relocating it.
+folder_path_of() {
+  local proj="$1" fid="$2"
+  [ -n "$fid" ] || return 0
+  printf "WITH RECURSIVE p AS (SELECT id,name,\"parentFolderId\",\"projectId\",0 AS d FROM folder WHERE id='%s' UNION ALL SELECT f.id,f.name,f.\"parentFolderId\",f.\"projectId\",p.d+1 FROM folder f JOIN p ON f.id=p.\"parentFolderId\") SELECT CASE WHEN bool_and(\"projectId\"='%s') THEN string_agg(name,'/' ORDER BY d DESC) ELSE '' END FROM p;\n" \
+    "$(sqesc "$fid")" "$(sqesc "$proj")" | pg
 }
 
 scope_ids() { [ -f "$SCOPE_FILE" ] && jq -r '(.workflows // [])[].id' "$SCOPE_FILE" || true; }
@@ -305,6 +316,16 @@ cmd_import() {
   fi
   echo "==> Target project: $proj"
 
+  # Remember each workflow's CURRENT folder before import (the CLI import clears
+  # parentFolderId): step 3 KEEPS a placement that already matches the repo path,
+  # so deploys are idempotent and respect a manual move when same-name folders exist.
+  declare -A PCUR=()
+  local _pf _pid
+  for _pf in "${files[@]}"; do
+    _pid="$(basename "$_pf" .json)"
+    PCUR["$_pid"]="$(printf "SELECT \"parentFolderId\" FROM workflow_entity WHERE id='%s';\n" "$(sqesc "$_pid")" | pg)"
+  done
+
   # 1. credential stubs: seed referenced-but-missing creds empty (diff vs the
   #    target's own export so filled-in secrets are never overwritten).
   local needed have stubs
@@ -339,13 +360,17 @@ cmd_import() {
   #    to a folder INSIDE $proj — reusing existing folders by name, creating only
   #    missing segments, never forcing the repo's folder ids. Folder + workflow are
   #    always in the SAME project, so parentFolderId can never dangle cross-project.
-  local f id rel fid
+  local f id rel fid pcur cpath
   for f in "${files[@]}"; do
     id="$(basename "$f" .json)"
     printf "DELETE FROM shared_workflow WHERE \"workflowId\"='%s' AND role='workflow:owner'; INSERT INTO shared_workflow (\"workflowId\",\"projectId\",role,\"createdAt\",\"updatedAt\") VALUES ('%s','%s','workflow:owner',now(),now()) ON CONFLICT (\"workflowId\",\"projectId\") DO UPDATE SET role='workflow:owner',\"updatedAt\"=now();\n" \
       "$(sqesc "$id")" "$(sqesc "$id")" "$(sqesc "$proj")" | pg >/dev/null
     rel="$(dirname "$f")"; rel="${rel#"$WORKFLOWS_DIR"}"; rel="${rel#/}"
-    fid="$(resolve_folder "$proj" "$rel")"
+    # Keep the workflow's existing folder if its path already matches the repo path
+    # (don't relocate); otherwise resolve/create the folder for the repo path.
+    fid=""; pcur="${PCUR[$id]:-}"
+    if [ -n "$pcur" ] && [ "$(folder_path_of "$proj" "$pcur")" = "$rel" ]; then fid="$pcur"; fi
+    [ -n "$fid" ] || fid="$(resolve_folder "$proj" "$rel")"
     if [ -n "$fid" ]; then
       printf "UPDATE workflow_entity SET \"parentFolderId\"='%s' WHERE id='%s';\n" "$(sqesc "$fid")" "$(sqesc "$id")" | pg >/dev/null
     else
@@ -427,7 +452,9 @@ cmd_import() {
     fi
   fi
 
-  # 6. orphans: in n8n (within scope) but not in git -> deactivate + report.
+  # 6. orphans: workflows OWNED by $proj, in scope, but gone from git -> deactivate.
+  #    Query the DB scoped to $proj — `n8n list:workflow` runs in the instance
+  #    owner's context and omits team-project workflows, so it can't be trusted here.
   local git_ids oid oname
   git_ids="$(for f in "${files[@]}"; do basename "$f" .json; done)"
   while IFS='|' read -r oid oname; do
@@ -435,11 +462,12 @@ cmd_import() {
     echo "  ⊟ '${oname}' (id=${oid}) not in git — deactivating; archive/delete it in the UI"
     if [ -n "$ACT_KEY" ]; then docker exec -e N8N_API_KEY="$ACT_KEY" "$N8N_CONTAINER" node -e "$NODE_ACTIVATE" "$oid" false >/dev/null 2>&1 || true
     else nexec n8n unpublish:workflow --id="$oid" >/dev/null 2>&1 || true; fi
-  done < <(nexec n8n list:workflow 2>/dev/null | tr -d '\r' | grep -E '^[A-Za-z0-9_-]+\|' || true)
+  done < <(printf "SELECT we.id,we.name FROM workflow_entity we JOIN shared_workflow sw ON sw.\"workflowId\"=we.id AND sw.role='workflow:owner' WHERE sw.\"projectId\"='%s';\n" "$(sqesc "$proj")" | pg || true)
 
-  # 7. verify presence.
-  local present rc=0
-  present="$(nexec n8n list:workflow 2>/dev/null | tr -d '\r' | cut -d'|' -f1)"
+  # 7. verify presence in the DB (reliable regardless of project/owner context).
+  local present rc=0 want_csv=""
+  for f in "${files[@]}"; do want_csv+="'$(sqesc "$(basename "$f" .json)")',"; done
+  present="$(printf "SELECT id FROM workflow_entity WHERE id IN (%s);\n" "${want_csv%,}" | pg)"
   for f in "${files[@]}"; do
     id="$(basename "$f" .json)"
     grep -qxF -- "$id" <<<"$present" || { echo "$SELF: id=$id not found after import" >&2; rc=1; }
