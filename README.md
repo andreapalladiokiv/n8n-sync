@@ -55,6 +55,7 @@ Env wins; else sourced from `$N8N_SYNC_CONFIG`, `./.n8n-sync.env`, or `./.env`:
 | var | meaning | default |
 |---|---|---|
 | `N8N_CONTAINER` | n8n container on the target (its `DB_POSTGRESDB_*` env is reused for SQL) | `n8n` |
+| `N8N_PROJECT_ID` | project that imported workflows + their folders are placed in (REQUIRED on multi-project/team instances) | oldest personal |
 | `N8N_API_KEY` | target public API key → live activation | — |
 | `N8N_REMOTE_DOCKER_HOST` | `ssh://user@host` for `--remote` | — |
 | `WORKFLOWS_DIR` | repo dir for workflow JSON + `folders.json` | `workflows` |

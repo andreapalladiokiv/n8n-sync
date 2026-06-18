@@ -21,7 +21,7 @@
 # n8n container — that image is minimal and has no jq; all JSON work is host-side.
 set -euo pipefail
 
-VERSION="1.1.0"
+VERSION="1.2.0"
 SELF="$(basename "$0")"
 REMOTE=0
 
@@ -35,6 +35,7 @@ load_config() {
   if [ -z "$cfg" ]; then for c in ./.n8n-sync.env ./.env; do [ -f "$c" ] && { cfg="$c"; break; }; done; fi
   [ -n "$cfg" ] && [ -f "$cfg" ] && { set -a; . "$cfg"; set +a; }
   N8N_CONTAINER="${N8N_CONTAINER:-n8n}"
+  N8N_PROJECT_ID="${N8N_PROJECT_ID:-}"
   ACT_KEY="${N8N_API_KEY:-}"
   WORKFLOWS_DIR="${WORKFLOWS_DIR:-workflows}"
   SCOPE_FILE="${SCOPE_FILE:-workflow-ids.json}"
@@ -54,6 +55,33 @@ nsh()   { docker exec "$N8N_CONTAINER" sh -c "$1"; }
 #     a managed/EXTERNAL Postgres, queue mode — since the n8n image has no psql and
 #     a separate pg container may not exist. Emulates psql -tAF'|' (see NODE_PG).
 pg() { docker exec -i "$N8N_CONTAINER" node -e "$NODE_PG"; }
+
+# --- SQL single-quote escaping for values we interpolate into statements.
+sqesc() { local s="$1"; printf '%s' "${s//\'/\'\'}"; }
+
+# resolve_folder PROJECT REL_PATH -> print the leaf folder id for the repo path
+# REL_PATH (e.g. "Main" or "A/B"; empty = project root) WITHIN project PROJECT,
+# creating only the missing segments. Matches existing folders by (projectId,
+# parentFolderId, name) so we REUSE the target's own folder ids and NEVER move a
+# folder across projects or force a repo id. New ids are generated in-DB.
+resolve_folder() {
+  local proj="$1" rel="$2" parent="" seg id parentval pclause
+  while [ -n "$rel" ]; do
+    seg="${rel%%/*}"
+    if [ "$rel" = "$seg" ]; then rel=""; else rel="${rel#*/}"; fi
+    [ -n "$seg" ] || continue
+    if [ -n "$parent" ]; then parentval="'$(sqesc "$parent")'"; pclause="\"parentFolderId\"='$(sqesc "$parent")'"
+    else parentval="NULL"; pclause="\"parentFolderId\" IS NULL"; fi
+    id="$(printf "SELECT id FROM folder WHERE \"projectId\"='%s' AND name='%s' AND %s LIMIT 1;\n" \
+            "$(sqesc "$proj")" "$(sqesc "$seg")" "$pclause" | pg)"
+    if [ -z "$id" ]; then
+      id="$(printf "INSERT INTO folder (id,name,\"projectId\",\"parentFolderId\",\"createdAt\",\"updatedAt\") VALUES ((SELECT string_agg(substr('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789',(floor(random()*62)+1)::int,1),'') FROM generate_series(1,16)),'%s','%s',%s,now(),now()) RETURNING id;\n" \
+              "$(sqesc "$seg")" "$(sqesc "$proj")" "$parentval" | pg)"
+    fi
+    parent="$id"
+  done
+  printf '%s' "$parent"
+}
 
 scope_ids() { [ -f "$SCOPE_FILE" ] && jq -r '(.workflows // [])[].id' "$SCOPE_FILE" || true; }
 
@@ -231,7 +259,7 @@ cmd_export() {
 
   # folders.json = folders actually used by in-scope workflows (+ ancestors).
   local all_folders used_json
-  all_folders="$(printf "SELECT coalesce(json_agg(json_build_object('id',id,'name',name,'parentFolderId',\"parentFolderId\") ORDER BY id),'[]') FROM folder;\n" | pg)"
+  all_folders="$(printf "SELECT coalesce(json_agg(json_build_object('id',id,'name',name,'parentFolderId',\"parentFolderId\",'projectId',\"projectId\") ORDER BY id),'[]') FROM folder;\n" | pg)"
   if [ "${#USED_FOLDER[@]}" -gt 0 ]; then
     used_json="$(printf '%s\n' "${!USED_FOLDER[@]}" | jq -R . | jq -s .)"
   else
@@ -262,6 +290,21 @@ cmd_import() {
   [ "${#files[@]}" -gt 0 ] || { echo "==> No workflows in scope — nothing to import."; exit 0; }
   echo "==> Importing ${#files[@]} workflow(s) into '$N8N_CONTAINER' (${DOCKER_HOST:-local docker}) ..."
 
+  # Target project for the imported workflows + their folders. Explicit
+  # N8N_PROJECT_ID is REQUIRED on multi-project instances (team projects); without
+  # it we fall back to the single personal project (simple/local installs only —
+  # guessing a project on a shared instance corrupts folder/workflow placement).
+  local proj
+  if [ -n "${N8N_PROJECT_ID:-}" ]; then
+    proj="$N8N_PROJECT_ID"
+    [ "$(printf "SELECT count(*) FROM project WHERE id='%s';\n" "$(sqesc "$proj")" | pg)" = "1" ] \
+      || die "N8N_PROJECT_ID='$proj' not found on the target"
+  else
+    proj="$(printf 'SELECT id FROM project WHERE type=%s ORDER BY "createdAt" LIMIT 1;\n' "'personal'" | pg)"
+    [ -n "$proj" ] || die "no project on the target — set N8N_PROJECT_ID"
+  fi
+  echo "==> Target project: $proj"
+
   # 1. credential stubs: seed referenced-but-missing creds empty (diff vs the
   #    target's own export so filled-in secrets are never overwritten).
   local needed have stubs
@@ -279,39 +322,34 @@ cmd_import() {
     nsh 'n8n import:credentials --input=/tmp/stubs/stubs.json; rm -rf /tmp/stubs'
   fi
 
-  # 2. folders: upsert the tree into the target's personal project (ids preserved,
-  #    projectId remapped). Two passes so the self-referential FK is satisfied.
-  local nfolders proj jqprog
-  nfolders="$([ -f "$WORKFLOWS_DIR/folders.json" ] && jq 'length' "$WORKFLOWS_DIR/folders.json" || echo 0)"
-  if [ "$nfolders" -gt 0 ]; then
-    proj="$(printf 'SELECT id FROM project WHERE type=%s ORDER BY "createdAt" LIMIT 1;\n' "'personal'" | pg)"
-    [ -n "$proj" ] || die "no personal project on target — cannot place folders"
-    echo "==> Upserting $nfolders folder(s) into project $proj ..."
-    jqprog="$(cat <<'JQ'
-def sq: tostring | gsub("'"; "''");
-def val: if . == null then "NULL" else "'\(sq)'" end;
-( .[] | "INSERT INTO folder (id,name,\"projectId\",\"createdAt\",\"updatedAt\") VALUES (\(.id|val),\(.name|val),\($proj|val),now(),now()) ON CONFLICT (id) DO UPDATE SET name=EXCLUDED.name,\"projectId\"=EXCLUDED.\"projectId\",\"updatedAt\"=now();" ),
-( .[] | "UPDATE folder SET \"parentFolderId\"=\(.parentFolderId|val),\"updatedAt\"=now() WHERE id=\(.id|val);" )
-JQ
-)"
-    jq -r --arg proj "$proj" "$jqprog" "$WORKFLOWS_DIR/folders.json" | pg >/dev/null
-  fi
-
-  # 3. workflows: import (create + update, id-preserving). Note: import deactivates.
-  echo "==> Importing ${#files[@]} workflow(s) via the container CLI ..."
-  local stage; stage="$(mktemp -d)"; cp "${files[@]}" "$stage/"
+  # 2. workflows: import into $proj (create + update, id-preserving). Strip the
+  #    repo's parentFolderId first so the import lands them at the project root and
+  #    never depends on a repo folder id existing on the target — folder placement
+  #    is resolved by PATH in step 3. Note: import deactivates.
+  echo "==> Importing ${#files[@]} workflow(s) via the container CLI into project $proj ..."
+  local stage f0; stage="$(mktemp -d)"
+  for f0 in "${files[@]}"; do jq '.parentFolderId = null' "$f0" > "$stage/$(basename "$f0")"; done
   nsh 'rm -rf /tmp/import && mkdir -p /tmp/import'
   docker cp "$stage/." "$N8N_CONTAINER:/tmp/import/" >/dev/null && rm -rf "$stage"
-  nsh 'n8n import:workflow --separate --input=/tmp/import; rm -rf /tmp/import'
+  nsh "n8n import:workflow --separate --input=/tmp/import; rm -rf /tmp/import"
 
-  # 4. folder membership (the CLI import doesn't set parentFolderId).
-  local f id pfid
+  # 3. ownership + folders. The CLI won't re-own an existing workflow (and on a
+  #    multi-user instance leaves a fresh import unowned), so set ownership directly
+  #    in shared_workflow: the workflow belongs to $proj. Then resolve its repo PATH
+  #    to a folder INSIDE $proj — reusing existing folders by name, creating only
+  #    missing segments, never forcing the repo's folder ids. Folder + workflow are
+  #    always in the SAME project, so parentFolderId can never dangle cross-project.
+  local f id rel fid
   for f in "${files[@]}"; do
-    id="$(basename "$f" .json)"; pfid="$(jq -r '.parentFolderId // empty' "$f")"
-    if [ -n "$pfid" ]; then
-      printf 'UPDATE workflow_entity SET "parentFolderId"=%s WHERE id=%s;\n' "'$pfid'" "'$id'" | pg >/dev/null
+    id="$(basename "$f" .json)"
+    printf "DELETE FROM shared_workflow WHERE \"workflowId\"='%s' AND role='workflow:owner'; INSERT INTO shared_workflow (\"workflowId\",\"projectId\",role,\"createdAt\",\"updatedAt\") VALUES ('%s','%s','workflow:owner',now(),now()) ON CONFLICT (\"workflowId\",\"projectId\") DO UPDATE SET role='workflow:owner',\"updatedAt\"=now();\n" \
+      "$(sqesc "$id")" "$(sqesc "$id")" "$(sqesc "$proj")" | pg >/dev/null
+    rel="$(dirname "$f")"; rel="${rel#"$WORKFLOWS_DIR"}"; rel="${rel#/}"
+    fid="$(resolve_folder "$proj" "$rel")"
+    if [ -n "$fid" ]; then
+      printf "UPDATE workflow_entity SET \"parentFolderId\"='%s' WHERE id='%s';\n" "$(sqesc "$fid")" "$(sqesc "$id")" | pg >/dev/null
     else
-      printf 'UPDATE workflow_entity SET "parentFolderId"=NULL WHERE id=%s;\n' "'$id'" | pg >/dev/null
+      printf "UPDATE workflow_entity SET \"parentFolderId\"=NULL WHERE id='%s';\n" "$(sqesc "$id")" | pg >/dev/null
     fi
   done
 
@@ -462,6 +500,12 @@ cmd_init() {
 # so no Postgres container name is needed.
 N8N_CONTAINER=n8n
 
+# Project that imported workflows + their folders belong to. REQUIRED on a
+# multi-project/team instance (a workflow and its folder must share a project).
+# Leave empty ONLY on a single-project (personal) instance — then the one personal
+# project is used. Get the id from the n8n project URL or `SELECT id,name FROM project`.
+N8N_PROJECT_ID=
+
 # Target's public API key (UI → Settings → n8n API). Enables LIVE activation
 # (triggers register without an n8n restart). Empty -> CLI publish (needs restart).
 N8N_API_KEY=
@@ -497,6 +541,15 @@ Setup complete. Next:
 EOF
 }
 
+# ============================================================= projects ====
+# List the target's projects so you can pick a N8N_PROJECT_ID. Header -> stderr,
+# so stdout is clean "id|name|type" rows (scriptable: awk -F'|' '$3=="personal"').
+cmd_projects() {
+  need_docker
+  echo "id|name|type   (set one as N8N_PROJECT_ID; empty uses the personal project)" >&2
+  printf 'SELECT id,name,type FROM project ORDER BY "createdAt";\n' | pg
+}
+
 # ================================================================= help ====
 cmd_help() {
   cat <<EOF
@@ -513,12 +566,14 @@ COMMANDS
                      seeds missing credential stubs; activates (see ACTIVATION).
   normalize [file…]  Canonicalize workflow JSON in place (all under $WORKFLOWS_DIR if none given).
   pull               Safe git pull: export → stash → git pull (3-way merge) → import.
+  projects           List the target's projects (id|name|type) to pick a N8N_PROJECT_ID.
   help               This text.
 
   --remote           Target N8N_REMOTE_DOCKER_HOST instead of the local daemon.
 
 CONFIG  (env wins; else \$N8N_SYNC_CONFIG | ./.n8n-sync.env | ./.env)
   N8N_CONTAINER          n8n container on the target            [n8n]
+  N8N_PROJECT_ID         project to own workflows + folders in   [oldest personal]
   N8N_API_KEY            target public API key -> live activate  []
   N8N_REMOTE_DOCKER_HOST ssh://user@host for --remote            []
   WORKFLOWS_DIR          repo dir for workflow JSON + folders.json [workflows]
@@ -528,6 +583,17 @@ WHY docker exec + SQL
   The n8n CLI preserves entity ids (the public REST API cannot create-with-id), and
   n8n folders have no CLI/API — only the DB. The SAME command works local or remote;
   only DOCKER_HOST differs. jq runs HOST-side only (the n8n image has no jq).
+
+PROJECTS & FOLDERS
+  On import every workflow is OWNED by N8N_PROJECT_ID (set directly in
+  shared_workflow — the CLI won't re-own an existing workflow), and its folder path
+  (the repo directory tree under $WORKFLOWS_DIR) is resolved to a folder INSIDE that
+  same project: existing folders are reused by name, only missing segments are
+  created, and folder ids are NEVER forced from the repo. Folder and workflow thus
+  always share a project, so n8n's "could not find the folder" can't happen. Unset
+  N8N_PROJECT_ID only on a single-project (personal) instance — guessing a project on
+  a multi-project/team instance mis-places folders. export records each folder's
+  projectId in folders.json.
 
 DATABASE ACCESS
   Folder sync + cycle-safe activation need raw SQL. n8n-sync runs it INSIDE the n8n
@@ -557,7 +623,7 @@ main() {
       --remote)        REMOTE=1 ;;
       -h|--help)       cmd="help" ;;
       --version)       echo "$SELF $VERSION"; exit 0 ;;
-      init|import|export|normalize|pull|help)
+      init|import|export|normalize|pull|projects|help)
                        [ -z "$cmd" ] && cmd="$1" || args+=("$1") ;;
       *)               args+=("$1") ;;
     esac
@@ -572,6 +638,7 @@ main() {
     import)    cmd_import ;;
     normalize) cmd_normalize "${args[@]+"${args[@]}"}" ;;
     pull)      cmd_pull ;;
+    projects)  cmd_projects ;;
   esac
 }
 main "$@"
