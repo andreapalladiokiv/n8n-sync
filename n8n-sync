@@ -21,7 +21,7 @@
 # n8n container — that image is minimal and has no jq; all JSON work is host-side.
 set -euo pipefail
 
-VERSION="1.4.0"
+VERSION="1.4.1"
 SELF="$(basename "$0")"
 REMOTE=0
 
@@ -477,7 +477,9 @@ cmd_pull() {
     git stash push -q -u -m "n8n-sync-local-edits" -- "$WORKFLOWS_DIR/"; stashed=1
     echo "==> Stashed your local workflow edits."
   fi
-  echo "==> Pulling ..."; git pull --no-edit
+  # N8N_SYNC=1 suppresses the post-merge/post-rewrite auto-import hook — pull does
+  # its own import below (after un-stashing local edits), so we mustn't double-fire.
+  echo "==> Pulling ..."; N8N_SYNC=1 git pull --no-edit
   if [ "$stashed" -eq 1 ]; then
     if git stash pop; then echo "==> Your local edits merged with incoming changes."
     else echo "" >&2; echo "✗ Merge conflict — resolve in ./$WORKFLOWS_DIR/, then run: $SELF import" >&2; exit 1; fi
