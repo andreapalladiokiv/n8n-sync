@@ -21,7 +21,7 @@
 # n8n container — that image is minimal and has no jq; all JSON work is host-side.
 set -euo pipefail
 
-VERSION="1.4.1"
+VERSION="1.4.2"
 SELF="$(basename "$0")"
 REMOTE=0
 
@@ -58,6 +58,15 @@ pg() { docker exec -i "$N8N_CONTAINER" node -e "$NODE_PG"; }
 
 # --- SQL single-quote escaping for values we interpolate into statements.
 sqesc() { local s="$1"; printf '%s' "${s//\'/\'\'}"; }
+
+# resolve_tag NAME -> print the tag_entity id for NAME, creating it if missing.
+# Tags are keyed by NAME (n8n keeps tag names unique); new ids are generated in-DB.
+resolve_tag() {
+  local name="$1" id
+  id="$(printf "SELECT id FROM tag_entity WHERE name='%s' ORDER BY \"createdAt\",id LIMIT 1;\n" "$(sqesc "$name")" | pg)"
+  [ -n "$id" ] || id="$(printf "INSERT INTO tag_entity (id,name,\"createdAt\",\"updatedAt\") VALUES ((SELECT string_agg(substr('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789',(floor(random()*62)+1)::int,1),'') FROM generate_series(1,16)),'%s',now(),now()) RETURNING id;\n" "$(sqesc "$name")" | pg)"
+  printf '%s' "$id"
+}
 
 scope_ids() { [ -f "$SCOPE_FILE" ] && jq -r '(.workflows // [])[].id' "$SCOPE_FILE" || true; }
 
@@ -348,15 +357,18 @@ JQ
     fi
 
     # 2. workflows: id-preserving CLI import of the CHANGED set (folders above
-    #    already exist, so parentFolderId resolves). Note: import deactivates.
+    #    already exist, so parentFolderId resolves). Strip .tags first — the CLI
+    #    import can't link name-only tags (null tagId crash); we link them by name
+    #    in step 3. Note: import deactivates.
     echo "==> Importing ${#changed[@]} changed workflow(s) via the container CLI ..."
-    local stage; stage="$(mktemp -d)"; cp "${changed[@]}" "$stage/"
+    local stage f0; stage="$(mktemp -d)"
+    for f0 in "${changed[@]}"; do jq '.tags = []' "$f0" > "$stage/$(basename "$f0")"; done
     nsh 'rm -rf /tmp/import && mkdir -p /tmp/import'
     docker cp "$stage/." "$N8N_CONTAINER:/tmp/import/" >/dev/null && rm -rf "$stage"
     nsh "n8n import:workflow --separate --input=/tmp/import; rm -rf /tmp/import"
 
-    # 3. ownership + folder membership (by id) for the imported set.
-    local f pfid
+    # 3. ownership + folder membership + tags (all by the workflow's repo JSON).
+    local f pfid tname
     for f in "${changed[@]}"; do
       id="$(basename "$f" .json)"
       printf "DELETE FROM shared_workflow WHERE \"workflowId\"='%s' AND role='workflow:owner'; INSERT INTO shared_workflow (\"workflowId\",\"projectId\",role,\"createdAt\",\"updatedAt\") VALUES ('%s','%s','workflow:owner',now(),now()) ON CONFLICT (\"workflowId\",\"projectId\") DO UPDATE SET role='workflow:owner',\"updatedAt\"=now();\n" \
@@ -367,6 +379,13 @@ JQ
       else
         printf "UPDATE workflow_entity SET \"parentFolderId\"=NULL WHERE id='%s';\n" "$(sqesc "$id")" | pg >/dev/null
       fi
+      # tags (by NAME): rebuild this workflow's links, creating missing tags.
+      printf "DELETE FROM workflows_tags WHERE \"workflowId\"='%s';\n" "$(sqesc "$id")" | pg >/dev/null
+      while IFS= read -r tname; do
+        [ -n "$tname" ] || continue
+        printf "INSERT INTO workflows_tags (\"workflowId\",\"tagId\") VALUES ('%s','%s') ON CONFLICT DO NOTHING;\n" \
+          "$(sqesc "$id")" "$(sqesc "$(resolve_tag "$tname")")" | pg >/dev/null
+      done < <(jq -r '.tags[]? // empty' "$f")
     done
 
     # 4. activation — CREDENTIAL-AWARE + cycle-safe (imported set only). A workflow
