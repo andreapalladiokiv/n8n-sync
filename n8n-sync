@@ -21,7 +21,7 @@
 # n8n container — that image is minimal and has no jq; all JSON work is host-side.
 set -euo pipefail
 
-VERSION="1.4.2"
+VERSION="1.4.3"
 SELF="$(basename "$0")"
 REMOTE=0
 
@@ -80,7 +80,7 @@ del(
 | .parentFolderId = (.parentFolderId // null)
 | .staticData = null
 | .pinData = (.pinData // {})
-| .tags = ((.tags // []) | map(.name) | unique)
+| .tags = ((.tags // []) | map(if type == "object" then .name else . end) | unique)
 | .settings = (.settings // {})
 JQ
 
