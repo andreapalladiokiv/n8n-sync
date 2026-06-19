@@ -21,7 +21,7 @@
 # n8n container — that image is minimal and has no jq; all JSON work is host-side.
 set -euo pipefail
 
-VERSION="1.4.3"
+VERSION="1.4.4"
 SELF="$(basename "$0")"
 REMOTE=0
 
@@ -245,7 +245,10 @@ cmd_export() {
 
   # folders.json = folders actually used by in-scope workflows (+ ancestors).
   local all_folders used_json
-  all_folders="$(printf "SELECT coalesce(json_agg(json_build_object('id',id,'name',name,'parentFolderId',\"parentFolderId\",'projectId',\"projectId\") ORDER BY id),'[]') FROM folder;\n" | pg)"
+  # NB: no projectId here — it is instance-specific (the exporting instance's project),
+  # never read back on import (import places folders into the resolved N8N_PROJECT_ID),
+  # and would otherwise churn folders.json between environments. Keep it portable.
+  all_folders="$(printf "SELECT coalesce(json_agg(json_build_object('id',id,'name',name,'parentFolderId',\"parentFolderId\") ORDER BY id),'[]') FROM folder;\n" | pg)"
   if [ "${#USED_FOLDER[@]}" -gt 0 ]; then
     used_json="$(printf '%s\n' "${!USED_FOLDER[@]}" | jq -R . | jq -s .)"
   else
@@ -625,7 +628,9 @@ PROJECTS & FOLDERS
   from its JSON) places it. Folder and workflow always share a project, so n8n's
   "could not find the folder" can't happen. export mirrors folders as directories
   named "Name - (id)" (the id keeps duplicate-named folders distinct in git) and
-  records id/name/parentFolderId/projectId in folders.json. Unset N8N_PROJECT_ID only
+  records id/name/parentFolderId in folders.json (NOT projectId — placement is decided
+  at import time by N8N_PROJECT_ID, so the manifest stays instance-independent). Unset
+  N8N_PROJECT_ID only
   on a single-project (personal) instance.
 
 DATABASE ACCESS
