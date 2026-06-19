@@ -21,7 +21,7 @@
 # n8n container — that image is minimal and has no jq; all JSON work is host-side.
 set -euo pipefail
 
-VERSION="1.2.1"
+VERSION="1.3.0"
 SELF="$(basename "$0")"
 REMOTE=0
 
@@ -58,41 +58,6 @@ pg() { docker exec -i "$N8N_CONTAINER" node -e "$NODE_PG"; }
 
 # --- SQL single-quote escaping for values we interpolate into statements.
 sqesc() { local s="$1"; printf '%s' "${s//\'/\'\'}"; }
-
-# resolve_folder PROJECT REL_PATH -> print the leaf folder id for the repo path
-# REL_PATH (e.g. "Main" or "A/B"; empty = project root) WITHIN project PROJECT,
-# creating only the missing segments. Matches existing folders by (projectId,
-# parentFolderId, name) so we REUSE the target's own folder ids and NEVER move a
-# folder across projects or force a repo id. New ids are generated in-DB.
-resolve_folder() {
-  local proj="$1" rel="$2" parent="" seg id parentval pclause
-  while [ -n "$rel" ]; do
-    seg="${rel%%/*}"
-    if [ "$rel" = "$seg" ]; then rel=""; else rel="${rel#*/}"; fi
-    [ -n "$seg" ] || continue
-    if [ -n "$parent" ]; then parentval="'$(sqesc "$parent")'"; pclause="\"parentFolderId\"='$(sqesc "$parent")'"
-    else parentval="NULL"; pclause="\"parentFolderId\" IS NULL"; fi
-    id="$(printf "SELECT id FROM folder WHERE \"projectId\"='%s' AND name='%s' AND %s ORDER BY \"createdAt\",id LIMIT 1;\n" \
-            "$(sqesc "$proj")" "$(sqesc "$seg")" "$pclause" | pg)"
-    if [ -z "$id" ]; then
-      id="$(printf "INSERT INTO folder (id,name,\"projectId\",\"parentFolderId\",\"createdAt\",\"updatedAt\") VALUES ((SELECT string_agg(substr('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789',(floor(random()*62)+1)::int,1),'') FROM generate_series(1,16)),'%s','%s',%s,now(),now()) RETURNING id;\n" \
-              "$(sqesc "$seg")" "$(sqesc "$proj")" "$parentval" | pg)"
-    fi
-    parent="$id"
-  done
-  printf '%s' "$parent"
-}
-
-# folder_path_of PROJECT FOLDER_ID -> print the folder's "A/B/Leaf" name-path if it
-# lives in PROJECT, else "". Used to KEEP a workflow's existing folder when it
-# already matches the repo path (idempotent; respects a manual placement among
-# several same-name folders) instead of relocating it.
-folder_path_of() {
-  local proj="$1" fid="$2"
-  [ -n "$fid" ] || return 0
-  printf "WITH RECURSIVE p AS (SELECT id,name,\"parentFolderId\",\"projectId\",0 AS d FROM folder WHERE id='%s' UNION ALL SELECT f.id,f.name,f.\"parentFolderId\",f.\"projectId\",p.d+1 FROM folder f JOIN p ON f.id=p.\"parentFolderId\") SELECT CASE WHEN bool_and(\"projectId\"='%s') THEN string_agg(name,'/' ORDER BY d DESC) ELSE '' END FROM p;\n" \
-    "$(sqesc "$fid")" "$(sqesc "$proj")" | pg
-}
 
 scope_ids() { [ -f "$SCOPE_FILE" ] && jq -r '(.workflows // [])[].id' "$SCOPE_FILE" || true; }
 
@@ -235,11 +200,12 @@ cmd_export() {
     [ -n "$wid" ] && WF_PARENT["$wid"]="$wpar"
   done < <(printf 'SELECT id,"parentFolderId" FROM workflow_entity;\n' | pg)
 
-  folder_path() {            # folder id -> "A/B/Leaf" (names; '/' in a name -> '-')
-    local id="$1" parts="" name
+  folder_path() {            # folder id -> "Name - (id)/Child - (id)" — the id keeps
+    local id="$1" parts="" name seg   # dirs unique (n8n allows duplicate folder names)
     while [ -n "${id:-}" ]; do
       name="${FNAME[$id]:-}"; [ -n "$name" ] || break
-      name="${name//\//-}"; parts="$name${parts:+/}$parts"; id="${FPARENT[$id]:-}"
+      name="${name//\//-}"; seg="$name - ($id)"
+      parts="$seg${parts:+/}$parts"; id="${FPARENT[$id]:-}"
     done
     printf '%s' "$parts"
   }
@@ -316,16 +282,6 @@ cmd_import() {
   fi
   echo "==> Target project: $proj"
 
-  # Remember each workflow's CURRENT folder before import (the CLI import clears
-  # parentFolderId): step 3 KEEPS a placement that already matches the repo path,
-  # so deploys are idempotent and respect a manual move when same-name folders exist.
-  declare -A PCUR=()
-  local _pf _pid
-  for _pf in "${files[@]}"; do
-    _pid="$(basename "$_pf" .json)"
-    PCUR["$_pid"]="$(printf "SELECT \"parentFolderId\" FROM workflow_entity WHERE id='%s';\n" "$(sqesc "$_pid")" | pg)"
-  done
-
   # 1. credential stubs: seed referenced-but-missing creds empty (diff vs the
   #    target's own export so filled-in secrets are never overwritten).
   local needed have stubs
@@ -343,36 +299,44 @@ cmd_import() {
     nsh 'n8n import:credentials --input=/tmp/stubs/stubs.json; rm -rf /tmp/stubs'
   fi
 
-  # 2. workflows: import into $proj (create + update, id-preserving). Strip the
-  #    repo's parentFolderId first so the import lands them at the project root and
-  #    never depends on a repo folder id existing on the target — folder placement
-  #    is resolved by PATH in step 3. Note: import deactivates.
-  echo "==> Importing ${#files[@]} workflow(s) via the container CLI into project $proj ..."
-  local stage f0; stage="$(mktemp -d)"
-  for f0 in "${files[@]}"; do jq '.parentFolderId = null' "$f0" > "$stage/$(basename "$f0")"; done
+  # 2. folders: id-preserving upsert of the tree into $proj (two passes for the
+  #    self-referential parentFolderId FK). Folders are keyed by ID — n8n allows
+  #    duplicate folder NAMES, so the name is NOT an identifier — and forced into
+  #    $proj so a workflow and its folder always share a project.
+  local nfolders jqprog
+  nfolders="$([ -f "$WORKFLOWS_DIR/folders.json" ] && jq 'length' "$WORKFLOWS_DIR/folders.json" || echo 0)"
+  if [ "$nfolders" -gt 0 ]; then
+    echo "==> Upserting $nfolders folder(s) into project $proj (by id) ..."
+    jqprog="$(cat <<'JQ'
+def sq: tostring | gsub("'"; "''");
+def val: if . == null then "NULL" else "'\(sq)'" end;
+( .[] | "INSERT INTO folder (id,name,\"projectId\",\"createdAt\",\"updatedAt\") VALUES (\(.id|val),\(.name|val),\($proj|val),now(),now()) ON CONFLICT (id) DO UPDATE SET name=EXCLUDED.name,\"projectId\"=EXCLUDED.\"projectId\",\"updatedAt\"=now();" ),
+( .[] | "UPDATE folder SET \"parentFolderId\"=\(.parentFolderId|val),\"updatedAt\"=now() WHERE id=\(.id|val);" )
+JQ
+)"
+    jq -r --arg proj "$proj" "$jqprog" "$WORKFLOWS_DIR/folders.json" | pg >/dev/null
+  fi
+
+  # 3. workflows: id-preserving CLI import (the folders above already exist, so each
+  #    workflow's parentFolderId resolves). Note: import deactivates.
+  echo "==> Importing ${#files[@]} workflow(s) via the container CLI ..."
+  local stage; stage="$(mktemp -d)"; cp "${files[@]}" "$stage/"
   nsh 'rm -rf /tmp/import && mkdir -p /tmp/import'
   docker cp "$stage/." "$N8N_CONTAINER:/tmp/import/" >/dev/null && rm -rf "$stage"
   nsh "n8n import:workflow --separate --input=/tmp/import; rm -rf /tmp/import"
 
-  # 3. ownership + folders. The CLI won't re-own an existing workflow (and on a
-  #    multi-user instance leaves a fresh import unowned), so set ownership directly
-  #    in shared_workflow: the workflow belongs to $proj. Then resolve its repo PATH
-  #    to a folder INSIDE $proj — reusing existing folders by name, creating only
-  #    missing segments, never forcing the repo's folder ids. Folder + workflow are
-  #    always in the SAME project, so parentFolderId can never dangle cross-project.
-  local f id rel fid pcur cpath
+  # 4. ownership + folder membership (both by id). The CLI won't re-own an existing
+  #    workflow (and on a multi-user instance leaves a fresh import unowned), so set
+  #    ownership directly in shared_workflow ($proj); set parentFolderId from the
+  #    workflow JSON (the CLI import doesn't reliably set it).
+  local f id pfid
   for f in "${files[@]}"; do
     id="$(basename "$f" .json)"
     printf "DELETE FROM shared_workflow WHERE \"workflowId\"='%s' AND role='workflow:owner'; INSERT INTO shared_workflow (\"workflowId\",\"projectId\",role,\"createdAt\",\"updatedAt\") VALUES ('%s','%s','workflow:owner',now(),now()) ON CONFLICT (\"workflowId\",\"projectId\") DO UPDATE SET role='workflow:owner',\"updatedAt\"=now();\n" \
       "$(sqesc "$id")" "$(sqesc "$id")" "$(sqesc "$proj")" | pg >/dev/null
-    rel="$(dirname "$f")"; rel="${rel#"$WORKFLOWS_DIR"}"; rel="${rel#/}"
-    # Keep the workflow's existing folder if its path already matches the repo path
-    # (don't relocate); otherwise resolve/create the folder for the repo path.
-    fid=""; pcur="${PCUR[$id]:-}"
-    if [ -n "$pcur" ] && [ "$(folder_path_of "$proj" "$pcur")" = "$rel" ]; then fid="$pcur"; fi
-    [ -n "$fid" ] || fid="$(resolve_folder "$proj" "$rel")"
-    if [ -n "$fid" ]; then
-      printf "UPDATE workflow_entity SET \"parentFolderId\"='%s' WHERE id='%s';\n" "$(sqesc "$fid")" "$(sqesc "$id")" | pg >/dev/null
+    pfid="$(jq -r '.parentFolderId // empty' "$f")"
+    if [ -n "$pfid" ]; then
+      printf "UPDATE workflow_entity SET \"parentFolderId\"='%s' WHERE id='%s';\n" "$(sqesc "$pfid")" "$(sqesc "$id")" | pg >/dev/null
     else
       printf "UPDATE workflow_entity SET \"parentFolderId\"=NULL WHERE id='%s';\n" "$(sqesc "$id")" | pg >/dev/null
     fi
@@ -613,15 +577,15 @@ WHY docker exec + SQL
   only DOCKER_HOST differs. jq runs HOST-side only (the n8n image has no jq).
 
 PROJECTS & FOLDERS
-  On import every workflow is OWNED by N8N_PROJECT_ID (set directly in
-  shared_workflow — the CLI won't re-own an existing workflow), and its folder path
-  (the repo directory tree under $WORKFLOWS_DIR) is resolved to a folder INSIDE that
-  same project: existing folders are reused by name, only missing segments are
-  created, and folder ids are NEVER forced from the repo. Folder and workflow thus
-  always share a project, so n8n's "could not find the folder" can't happen. Unset
-  N8N_PROJECT_ID only on a single-project (personal) instance — guessing a project on
-  a multi-project/team instance mis-places folders. export records each folder's
-  projectId in folders.json.
+  Folders are identified by ID, not name — n8n allows duplicate folder names. On
+  import every workflow is OWNED by N8N_PROJECT_ID (set directly in shared_workflow,
+  since the CLI won't re-own an existing workflow); the folder tree is upserted BY ID
+  into that same project from folders.json; and each workflow's parentFolderId (an id
+  from its JSON) places it. Folder and workflow always share a project, so n8n's
+  "could not find the folder" can't happen. export mirrors folders as directories
+  named "Name - (id)" (the id keeps duplicate-named folders distinct in git) and
+  records id/name/parentFolderId/projectId in folders.json. Unset N8N_PROJECT_ID only
+  on a single-project (personal) instance.
 
 DATABASE ACCESS
   Folder sync + cycle-safe activation need raw SQL. n8n-sync runs it INSIDE the n8n
