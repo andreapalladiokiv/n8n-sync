@@ -14,7 +14,9 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const BUNDLE = path.join(here, '..', 'dist', 'n8n-sync.mjs');
 const FIX = path.join(here, 'fixtures');
 
-const cases = fs.readdirSync(FIX).filter((f) => f.endsWith('.input.json')).map((f) => f.replace('.input.json', ''));
+const cases = fs.readdirSync(FIX)
+    .filter(f => f.endsWith('.input.json'))
+    .map(f => f.replace('.input.json', ''));
 
 function runNormalize(srcPath) {
   const tmp = path.join(os.tmpdir(), `nsp-${path.basename(srcPath)}-${process.pid}-${Math.floor(performance.now())}.json`);

@@ -15,8 +15,9 @@
   "scripts": {
     "build": "node build.mjs",
     "typecheck": "tsc --noEmit",
-    "pretest": "npm run build",
-    "test": "node --test",
+    "test:unit": "node --import tsx --test \"test/unit/*.test.ts\"",
+    "test": "npm run typecheck && npm run build && node --import tsx --test \"test/unit/*.test.ts\" \"test/*.test.mjs\"",
+    "test:it": "npm run build && node --import tsx --test \"test/integration/*.it.test.mjs\"",
     "dev": "tsx src/cli.ts"
   },
   "devDependencies": {

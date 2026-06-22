@@ -4,6 +4,7 @@ import { Command } from 'commander';
 import { serializeWorkflow } from './normalize';
 import { resolveConfig } from './config';
 import type { Config } from './config';
+import { walkWorkflowJson } from './fsutil';
 import { cmdExport } from './commands/export';
 import { cmdImport } from './commands/import';
 import { cmdProjects } from './commands/projects';
@@ -17,17 +18,6 @@ function withSharedOptions(cmd: Command): Command {
     .option('--project-id <id>', 'project that owns workflows + folders [env N8N_PROJECT_ID]')
     .option('--workflows-dir <dir>', 'repo dir for workflow JSON [env WORKFLOWS_DIR]')
     .option('--scope-file <path>', 'JSON scope limiting which workflows sync [env SCOPE_FILE]');
-}
-
-function walkWorkflowJson(dir: string): string[] {
-  if (!fs.existsSync(dir)) return [];
-  const out: string[] = [];
-  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
-    const p = path.join(dir, e.name);
-    if (e.isDirectory()) out.push(...walkWorkflowJson(p));
-    else if (e.isFile() && e.name.endsWith('.json') && e.name !== 'folders.json') out.push(p);
-  }
-  return out;
 }
 
 function runNormalize(files: string[], cfg: Config): void {

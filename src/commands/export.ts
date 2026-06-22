@@ -5,35 +5,10 @@ import { exportAllWorkflows } from '../n8n';
 import { serializeWorkflow } from '../normalize';
 import { scopeIds } from '../config';
 import type { Config } from '../config';
+import { buildFolderPath } from '../folders';
+import { walkWorkflowJson, removeEmptyDirs } from '../fsutil';
 
 interface FolderRow { id: string; name: string; parentFolderId: string | null }
-
-/** "Name - (id)" path segment; '/' in names is flattened to '-' (it's a dir name). */
-function segment(name: string, id: string): string {
-  return `${name.replace(/\//g, '-')} - (${id})`;
-}
-
-function listRepoWorkflowFiles(dir: string): string[] {
-  if (!fs.existsSync(dir)) return [];
-  const out: string[] = [];
-  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
-    const p = path.join(dir, e.name);
-    if (e.isDirectory()) out.push(...listRepoWorkflowFiles(p));
-    else if (e.isFile() && e.name.endsWith('.json') && e.name !== 'folders.json') out.push(p);
-  }
-  return out;
-}
-
-function removeEmptyDirs(dir: string): void {
-  if (!fs.existsSync(dir)) return;
-  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
-    if (e.isDirectory()) {
-      const p = path.join(dir, e.name);
-      removeEmptyDirs(p);
-      if (fs.readdirSync(p).length === 0) fs.rmdirSync(p);
-    }
-  }
-}
 
 export async function cmdExport(cfg: Config): Promise<void> {
   const scope = new Set(scopeIds(cfg.scopeFile));
@@ -55,28 +30,16 @@ export async function cmdExport(cfg: Config): Promise<void> {
     // Folder tree + workflow→folder membership, in the DB's own id order so
     // folders.json ordering matches the bash engine regardless of pg collation.
     const folders = await db.rows<FolderRow>('SELECT id, name, "parentFolderId" FROM folder ORDER BY id');
-    const fname = new Map(folders.map((f) => [f.id, f.name]));
-    const fparent = new Map(folders.map((f) => [f.id, f.parentFolderId]));
+    const names = new Map(folders.map((f) => [f.id, f.name]));
+    const parents = new Map(folders.map((f) => [f.id, f.parentFolderId]));
     const wfParent = new Map(
       (await db.rows<{ id: string; parentFolderId: string | null }>('SELECT id, "parentFolderId" FROM workflow_entity'))
         .map((w) => [w.id, w.parentFolderId]),
     );
 
-    const folderPath = (id: string | null): string => {
-      const parts: string[] = [];
-      let cur = id;
-      const seen = new Set<string>();
-      while (cur && fname.has(cur) && !seen.has(cur)) {
-        seen.add(cur); // guard against a parentFolderId cycle (finding #18)
-        parts.unshift(segment(fname.get(cur)!, cur));
-        cur = fparent.get(cur) ?? null;
-      }
-      return parts.join('/');
-    };
-
     // Rebuild from scratch so folder MOVES are reflected; out-of-scope files pruned.
     fs.mkdirSync(cfg.workflowsDir, { recursive: true });
-    for (const f of listRepoWorkflowFiles(cfg.workflowsDir)) fs.rmSync(f);
+    for (const f of walkWorkflowJson(cfg.workflowsDir)) fs.rmSync(f);
 
     const used = new Set<string>();
     let kept = 0;
@@ -84,8 +47,8 @@ export async function cmdExport(cfg: Config): Promise<void> {
       const id = base.replace(/\.json$/, '');
       if (!inScope(id)) continue;
       const pfid = wfParent.get(id) ?? null;
-      if (pfid) for (let c: string | null = pfid; c && fparent.has(c); c = fparent.get(c) ?? null) used.add(c);
-      const rel = pfid ? folderPath(pfid) : '';
+      if (pfid) for (let c: string | null = pfid; c && parents.has(c); c = parents.get(c) ?? null) used.add(c);
+      const rel = pfid ? buildFolderPath(pfid, names, parents) : '';
       const destDir = rel ? path.join(cfg.workflowsDir, rel) : cfg.workflowsDir;
       fs.mkdirSync(destDir, { recursive: true });
       const wf = JSON.parse(fs.readFileSync(path.join(dump, base), 'utf8')) as Record<string, unknown>;
@@ -94,7 +57,7 @@ export async function cmdExport(cfg: Config): Promise<void> {
       kept++;
     }
 
-    // folders.json = folders used by in-scope workflows (+ ancestors), DB order.
+    // folders.json = folders used by in-scope workflows (+ ancestors), DB id-order.
     const manifest = folders
       .filter((f) => used.has(f.id))
       .map((f) => ({ id: f.id, name: f.name, parentFolderId: f.parentFolderId }));

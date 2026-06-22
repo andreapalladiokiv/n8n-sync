@@ -1,59 +1,20 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import crypto from 'node:crypto';
 import { Db } from '../db';
 import { exportAllWorkflows, importWorkflows, existingCredentialIds, importCredentials, unpublishViaCli } from '../n8n';
 import { serializeWorkflow } from '../normalize';
 import { setActive, type ActResult } from '../activate';
 import { scopeIds } from '../config';
 import type { Config } from '../config';
+import { credsOf, tagName, type Cred, type Workflow } from '../workflow';
+import { walkWorkflowJson } from '../fsutil';
+import { genId } from '../ids';
 
-interface WfNode { disabled?: boolean; credentials?: Record<string, { id?: string; name?: string }> }
-interface Workflow {
-  name?: string; active?: boolean; parentFolderId?: string | null;
-  tags?: unknown[]; nodes?: WfNode[]; [k: string]: unknown;
-}
-interface Cred { id: string; name: string; type: string }
 interface FolderManifest { id: string; name: string; parentFolderId: string | null }
 
 const sleep = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms));
-
-const ID_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-function genId(n = 16): string {
-  const b = crypto.randomBytes(n);
-  let s = '';
-  for (let i = 0; i < n; i++) s += ID_ALPHABET[b[i]! % ID_ALPHABET.length];
-  return s;
-}
-
-function walkJson(dir: string): string[] {
-  if (!fs.existsSync(dir)) return [];
-  const out: string[] = [];
-  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
-    const p = path.join(dir, e.name);
-    if (e.isDirectory()) out.push(...walkJson(p));
-    else if (e.isFile() && e.name.endsWith('.json') && e.name !== 'folders.json') out.push(p);
-  }
-  return out;
-}
-
 const readWorkflow = (file: string): Workflow => JSON.parse(fs.readFileSync(file, 'utf8')) as Workflow;
-
-/** Credentials referenced by a workflow's nodes; unique by id. */
-function credsOf(wf: Workflow, enabledOnly: boolean): Cred[] {
-  const seen = new Set<string>();
-  const out: Cred[] = [];
-  for (const n of wf.nodes ?? []) {
-    if (enabledOnly && n.disabled === true) continue;
-    for (const [type, v] of Object.entries(n.credentials ?? {})) {
-      if (v && v.id != null && !seen.has(v.id)) { seen.add(v.id); out.push({ id: v.id, name: v.name ?? '', type }); }
-    }
-  }
-  return out;
-}
-
-const tagName = (t: unknown): string | undefined => (typeof t === 'string' ? t : (t as { name?: string })?.name);
 
 /** Find-or-create a tag_entity by NAME (n8n keeps tag names unique). */
 async function resolveTag(db: Db, name: string): Promise<string> {
@@ -67,7 +28,7 @@ async function resolveTag(db: Db, name: string): Promise<string> {
 export async function cmdImport(cfg: Config): Promise<number> {
   const scope = new Set(scopeIds(cfg.scopeFile));
   const inScope = (id: string): boolean => scope.size === 0 || scope.has(id);
-  let files = walkJson(cfg.workflowsDir).sort();
+  let files = walkWorkflowJson(cfg.workflowsDir).sort();
   if (scope.size) {
     const kept = files.filter((f) => inScope(path.basename(f, '.json')));
     for (const f of files) if (!kept.includes(f)) process.stderr.write(`  • skipped ${f} (not in scope)\n`);
