@@ -1,75 +1,78 @@
-# n8n-sync
+# n8n-sync (TypeScript engine)
 
-Portable, single-file CI/CD sync for [n8n](https://n8n.io) workflows. Syncs
-workflows between a git repo and a running n8n instance over `docker exec` — the
-**same command works local or remote**; only `DOCKER_HOST` differs (`--remote`).
+> **Status: `2.0.0-alpha` — in-progress rewrite** of the bash `n8n-sync` engine.
+> Core commands (`normalize`, `export`, `import`, `projects`) are byte-parity-verified
+> against the bash engine on a live n8n instance. The bash engine (`./n8n-sync`,
+> kept in this repo on `master`) remains the reference until cutover.
 
-It does what the public REST API can't: **id-preserving** workflow import (via the
-n8n CLI), **folder** sync (via SQL — folders have no API), credential **stub**
-seeding, and **cycle-safe, credential-aware activation**. Run `n8n-sync help`.
+CI/CD sync for [n8n](https://n8n.io) workflows: version-control workflows in git and
+sync them with a running n8n instance, **id-preserving** (via the n8n CLI), with folder
+sync and credential-aware, cycle-safe activation.
 
-The raw SQL it needs runs **inside the n8n container** via `node` + the `pg` module
-bundled in the n8n image, using n8n's own `DB_POSTGRESDB_*` env. That's the one
-approach that works everywhere — a local pg container, a managed/external Postgres,
-queue mode — with no `psql` and no separate pg container.
+## Architecture: runs *inside* the n8n container
 
-## Install
+Unlike the bash engine (which ran on the host and shelled in over `docker exec`), this
+engine is **baked into the n8n image and runs in-container**, where everything it needs
+already lives:
 
-**As a git submodule (pinned — recommended):**
+- **Database** — a native `pg.Client` over n8n's own `DB_POSTGRESDB_*` env (parameterized
+  queries; the whole DB mutation runs in one transaction).
+- **Workflows** — the `n8n` CLI (`export/import:workflow`) via `child_process`, so entity
+  ids stay stable (the REST API cannot create-with-id).
+- **Activation** — the n8n REST API on `localhost` (`fetch`), so triggers register live.
 
-```sh
-git submodule add https://github.com/andreapalladiokiv/n8n-sync vendor/n8n-sync
-git -C vendor/n8n-sync checkout v1.1.0        # pin a version
-git add .gitmodules vendor/n8n-sync
-vendor/n8n-sync/n8n-sync init                 # scaffold the project
-```
+`pg` is **not bundled** — it is resolved at runtime from n8n's `node_modules`. Everything
+else (incl. the CLI lib) bundles into a single `dist/n8n-sync.mjs`.
 
-CI must check out submodules (`actions/checkout@v4` with `submodules: true`), and
-fresh clones run `git submodule update --init`.
+The host side (a Makefile / CI) is thin: put the repo workflows where the container can
+read them, then `docker exec <container> n8n-sync <command>`. `normalize` is pure and also
+runs host-side (e.g. a pre-commit hook).
 
-**Or vendor the single file (no submodule):**
+## Commands
 
-```sh
-mkdir -p bin
-curl -fsSL https://raw.githubusercontent.com/andreapalladiokiv/n8n-sync/v1.1.0/n8n-sync \
-  -o bin/n8n-sync && chmod +x bin/n8n-sync
-bin/n8n-sync init
-```
-
-## Use
-
-```sh
-n8n-sync init                 # workflows/, workflow-ids.json, .n8n-sync.env, .gitignore
-# edit .n8n-sync.env -> set N8N_API_KEY (+ container names if they differ)
-n8n-sync export               # n8n  -> repo   (commit ./workflows/)
-n8n-sync import               # repo -> n8n
-n8n-sync import --remote      # ...into N8N_REMOTE_DOCKER_HOST (over SSH)
-```
-
-Run `n8n-sync help` for all commands, config vars, and the activation model.
-
-## Config
-
-Env wins; else sourced from `$N8N_SYNC_CONFIG`, `./.n8n-sync.env`, or `./.env`:
-
-| var | meaning | default |
+| Command | Where it runs | What it does |
 |---|---|---|
-| `N8N_CONTAINER` | n8n container on the target (its `DB_POSTGRESDB_*` env is reused for SQL) | `n8n` |
-| `N8N_PROJECT_ID` | project that imported workflows + their folders are placed in (REQUIRED on multi-project/team instances) | oldest personal |
-| `N8N_API_KEY` | target public API key → live activation | — |
-| `N8N_REMOTE_DOCKER_HOST` | `ssh://user@host` for `--remote` | — |
-| `WORKFLOWS_DIR` | repo dir for workflow JSON + `folders.json` | `workflows` |
-| `SCOPE_FILE` | `{"workflows":[{id,name}]}` limiting which ids sync | `workflow-ids.json` |
+| `normalize [files…]` | host or container | Canonicalize workflow JSON in place (byte-identical to the legacy `jq -S` form). |
+| `export` | in-container | n8n → repo: export in-scope workflows, normalize, mirror the folder tree, write `folders.json`. |
+| `import` | in-container | repo → n8n: id-preserving import, folder upsert, credential stubs, credential-aware + cycle-safe activation, orphan deactivation. |
+| `projects` | in-container | List projects (`id\|name\|type`) to pick a project id. |
 
-## Requirements
+`pull` is host orchestration (git + `docker exec` of export/import) and lives in the
+consuming repo's `Makefile` (`make pull`), not in this engine. `init` is dropped — the
+project template scaffolds the repo.
 
-- Host: `bash` 4+, `jq`, `docker` (and `git` for `pull`). **`jq` is host-side only** —
-  the n8n container needs nothing extra.
-- Target: an n8n instance reachable via `docker exec` (local socket or a remote
-  daemon over `DOCKER_HOST=ssh://…`). Postgres can be a sibling container or
-  managed/external — n8n-sync reads the DB creds from the n8n container's own env
-  and runs its SQL there, so no pg container is required.
+## Configuration (env, overridable by flags)
 
-## License
+Precedence: **flag > env > default**.
 
-MIT — see [LICENSE](LICENSE).
+| Env | Flag | Default | |
+|---|---|---|---|
+| `N8N_PROJECT_ID` | `--project-id` | oldest personal | project that owns imported workflows + folders |
+| `N8N_API_KEY` | — | — | present → live activation; empty → CLI publish (needs restart) |
+| `WORKFLOWS_DIR` | `--workflows-dir` | `workflows` | repo dir for workflow JSON |
+| `SCOPE_FILE` | `--scope-file` | `workflow-ids.json` | `{"workflows":[{id,name}]}`; empty = all |
+| `DB_POSTGRESDB_*` | — | (n8n's) | DB connection, read from n8n's own env (honors `_PASSWORD_FILE`, `_SSL_*`, `_SCHEMA`) |
+
+`--dry-run` plans without mutating.
+
+## Install (bake into the image)
+
+The custom n8n image installs the engine from this repo, e.g. in its Dockerfile:
+
+```dockerfile
+RUN npm i -g github:andreapalladiokiv/n8n-sync#ts-rewrite   # builds dist/ via `prepare`
+```
+
+Then on the host / in CI: `docker exec <container> n8n-sync import`.
+
+## Develop
+
+```sh
+npm install          # builds dist/ (prepare hook)
+npm test             # typecheck + build + unit tests + bundle byte-parity
+npm run test:unit    # fast unit tests only
+N8N_SYNC_IT_CONTAINER=n8n npm run test:it   # in-container integration smoke
+```
+
+Requirements: Node ≥ 18. Inside the n8n container, `pg` and the `n8n` CLI must be present
+(they always are).

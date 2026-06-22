@@ -36,11 +36,6 @@ function runNormalize(files: string[], cfg: Config): void {
   if (changed === 0) process.stderr.write('all workflow JSON already canonical\n');
 }
 
-function notPorted(name: string): never {
-  process.stderr.write(`n8n-sync: '${name}' is not ported to the TS engine yet (use the bash engine for now)\n`);
-  process.exit(2);
-}
-
 const program = new Command();
 program
   .name('n8n-sync')
@@ -60,6 +55,13 @@ withSharedOptions(program.command('export'))
 withSharedOptions(program.command('import'))
   .description('repo -> n8n: id-preserving import, folders, credential-aware + cycle-safe activation')
   .action(async (_opts: unknown, cmd: Command) => { process.exitCode = await cmdImport(resolveConfig(cmd)); });
+
+program.command('pull')
+  .description('(host orchestration) export -> git pull -> import — run via `make pull`, not in-container')
+  .action(() => {
+    process.stderr.write('n8n-sync: `pull` is host-side orchestration (git + docker exec export/import); run it from the Makefile (`make pull`), not the in-container engine.\n');
+    process.exit(2);
+  });
 
 withSharedOptions(program.command('projects'))
   .description("list the target's projects (id|name|type) to pick a --project-id")
