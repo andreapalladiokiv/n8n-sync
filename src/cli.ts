@@ -5,6 +5,7 @@ import { serializeWorkflow } from './normalize';
 import { resolveConfig } from './config';
 import type { Config } from './config';
 import { cmdExport } from './commands/export';
+import { cmdImport } from './commands/import';
 import { cmdProjects } from './commands/projects';
 
 const VERSION = '2.0.0-alpha.0';
@@ -68,7 +69,7 @@ withSharedOptions(program.command('export'))
 
 withSharedOptions(program.command('import'))
   .description('repo -> n8n: id-preserving import, folders, credential-aware + cycle-safe activation')
-  .action(() => notPorted('import'));
+  .action(async (_opts: unknown, cmd: Command) => { process.exitCode = await cmdImport(resolveConfig(cmd)); });
 
 withSharedOptions(program.command('projects'))
   .description("list the target's projects (id|name|type) to pick a --project-id")

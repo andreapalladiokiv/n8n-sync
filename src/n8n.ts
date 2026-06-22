@@ -21,10 +21,15 @@ function mkTmp(prefix: string): string {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
 }
 
-/** `export:workflow --all --separate` → a fresh temp dir of <id>.json files. */
+/** `export:workflow --all --separate` → a fresh temp dir of <id>.json files.
+ *  Tolerates a non-zero exit: the n8n CLI errors when there are NO workflows to
+ *  export, which is a legitimate empty instance (fresh import), not a failure.
+ *  Real failures are caught by callers comparing file count vs the DB count. */
 export function exportAllWorkflows(): string {
   const dir = mkTmp('ns-export-');
-  n8n(['export:workflow', '--all', '--separate', '--pretty', `--output=${dir}`]);
+  try {
+    n8n(['export:workflow', '--all', '--separate', '--pretty', `--output=${dir}`]);
+  } catch { /* empty instance → no files; caller's DB-count guard catches real failures */ }
   return dir;
 }
 
