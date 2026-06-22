@@ -1,0 +1,28 @@
+{
+  "name": "n8n-sync",
+  "version": "2.0.0-alpha.0",
+  "description": "CI/CD sync for n8n workflows — TypeScript engine, runs in-container (pg + n8n CLI) and host-side (normalize/validate).",
+  "type": "module",
+  "bin": {
+    "n8n-sync": "dist/n8n-sync.mjs"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "esbuild src/cli.ts --bundle --platform=node --format=esm --target=node18 --packages=external --banner:js=\"#!/usr/bin/env node\" --outfile=dist/n8n-sync.mjs",
+    "typecheck": "tsc --noEmit",
+    "pretest": "npm run build",
+    "test": "node --test",
+    "dev": "tsx src/cli.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "esbuild": "^0.28.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}

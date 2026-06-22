@@ -1,0 +1,38 @@
+{
+  "active": true,
+  "connections": {},
+  "id": "abc123XYZ",
+  "name": "Synthetic edge cases",
+  "nodes": [
+    {
+      "name": "Bravo",
+      "parameters": {
+        "a": 2,
+        "z": 1
+      },
+      "position": [
+        460,
+        220
+      ],
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1.1
+    },
+    {
+      "name": "Alpha",
+      "position": [
+        240,
+        220
+      ],
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 2
+    }
+  ],
+  "parentFolderId": null,
+  "pinData": {},
+  "settings": {},
+  "staticData": null,
+  "tags": [
+    "alpha",
+    "zeta"
+  ]
+}

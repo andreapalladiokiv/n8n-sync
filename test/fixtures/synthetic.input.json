@@ -1,0 +1,21 @@
+{
+  "name": "Synthetic edge cases",
+  "id": "abc123XYZ",
+  "createdAt": "2020-01-01T00:00:00.000Z",
+  "updatedAt": "2020-01-02T00:00:00.000Z",
+  "versionId": "v-should-be-stripped",
+  "triggerCount": 3,
+  "isArchived": false,
+  "meta": { "templateId": "x" },
+  "active": true,
+  "nodes": [
+    { "type": "n8n-nodes-base.set", "typeVersion": 1.1, "position": [460, 220], "name": "Bravo", "parameters": { "z": 1, "a": 2 } },
+    { "name": "Alpha", "type": "n8n-nodes-base.noOp", "typeVersion": 2, "position": [240, 220] }
+  ],
+  "connections": {},
+  "tags": [
+    { "id": "t2", "name": "zeta", "createdAt": "x" },
+    { "id": "t1", "name": "alpha" },
+    "alpha"
+  ]
+}

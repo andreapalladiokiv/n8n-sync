@@ -1,0 +1,5373 @@
+{
+  "active": true,
+  "connections": {
+    "Action to do": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Update last message1",
+            "type": "main"
+          }
+        ],
+        [
+          {
+            "index": 0,
+            "node": "Update last message",
+            "type": "main"
+          }
+        ],
+        [
+          {
+            "index": 0,
+            "node": "Post message",
+            "type": "main"
+          }
+        ],
+        [
+          {
+            "index": 0,
+            "node": "Update last message2",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Analyze image": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Return Caption",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Attachments": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Split attachments",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Authorization": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Get settings",
+            "type": "main"
+          }
+        ],
+        [
+          {
+            "index": 0,
+            "node": "Respond to Webhook1",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Close": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Save event to Click-House Close",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Consume opener": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "context_compression",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Create record": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Switch",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Custom welcome - Update last message": {
+      "main": [
+        []
+      ]
+    },
+    "Delete last message": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Update request_id",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Error Payload": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Support Error - Update last message",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Execution Data": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Authorization",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Return empty",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Failure - random phrase": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Response failure - pending",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Failure - random phrase1": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Response failure - pending1",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Failure Respond to Webhook": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Failure",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Failure Respond to Webhook1": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Post system message - Operators are busy",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Failure handling": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Post system message - Long text",
+            "type": "main"
+          }
+        ],
+        [
+          {
+            "index": 0,
+            "node": "Failure - random phrase1",
+            "type": "main"
+          }
+        ],
+        [
+          {
+            "index": 0,
+            "node": "Failure - random phrase1",
+            "type": "main"
+          }
+        ],
+        [
+          {
+            "index": 0,
+            "node": "Failure - random phrase1",
+            "type": "main"
+          }
+        ],
+        [
+          {
+            "index": 0,
+            "node": "Failure - random phrase",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Get Project": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Trigger",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Get Project - first": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Create record",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Get file": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Extract from File",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Get settings": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "visitor_exists",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Handler": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Get Project",
+            "type": "main"
+          }
+        ],
+        [
+          {
+            "index": 0,
+            "node": "Log conversation id - message",
+            "type": "main"
+          }
+        ],
+        [
+          {
+            "index": 0,
+            "node": "Failure handling",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Log conversation id - message": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Operators busy response",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Merge attachment branches": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Log conversation id - message",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Mime type": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Get file",
+            "type": "main"
+          }
+        ],
+        [
+          {
+            "index": 0,
+            "node": "Analyze image",
+            "type": "main"
+          }
+        ],
+        [
+          {
+            "index": 0,
+            "node": "Not supported",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "New conversation": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Save event to Click-House Chat Started",
+            "type": "main"
+          }
+        ],
+        [
+          {
+            "index": 0,
+            "node": "context_compression",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Not supported": {
+      "main": [
+        [
+          {
+            "index": 2,
+            "node": "Merge attachment branches",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Operators busy response": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Delete last message",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "PII Decrypt": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "search_quotes started",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "PII Encrypt": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "virtual_agent",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Post system message - Long text": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Operators busy response",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Post system message - Operators are busy": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Operators busy response",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Respond - Trigger": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Custom welcome - Update last message",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Response failure - pending": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Failure Respond to Webhook",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Response failure - pending1": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Failure Respond to Webhook1",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Return Caption": {
+      "main": [
+        [
+          {
+            "index": 1,
+            "node": "Merge attachment branches",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Return empty": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Merge attachment branches",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "SalesIQ - Intro": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "VARs",
+            "type": "main"
+          },
+          {
+            "index": 0,
+            "node": "Execution Data",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Save event to Click-House Chat Started": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Consume opener",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Split attachments": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Mime type",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Support Error - Update last message": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Error Respond",
+            "type": "main"
+          },
+          {
+            "index": 0,
+            "node": "Support - Stop and Error",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Handler",
+            "type": "main"
+          }
+        ],
+        [
+          {
+            "index": 0,
+            "node": "Attachments",
+            "type": "main"
+          }
+        ],
+        [
+          {
+            "index": 0,
+            "node": "Handler",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Trigger": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Respond - Trigger",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Update last message": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Forward",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Update last message1": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Close",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Update last message2": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Respond",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Update request_id": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "New conversation",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "VARs": {
+      "main": [
+        []
+      ]
+    },
+    "context_compression": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "entry_point",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "entry_point": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "PII Encrypt",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "search_quotes started": {
+      "main": [
+        [],
+        [
+          {
+            "index": 0,
+            "node": "Action to do",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "success": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "PII Decrypt",
+            "type": "main"
+          }
+        ],
+        [
+          {
+            "index": 0,
+            "node": "Error Payload",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "virtual_agent": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "success",
+            "type": "main"
+          }
+        ],
+        [
+          {
+            "index": 0,
+            "node": "Error Payload",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "visitor_exists": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Switch",
+            "type": "main"
+          }
+        ],
+        [
+          {
+            "index": 0,
+            "node": "Get Project - first",
+            "type": "main"
+          }
+        ]
+      ]
+    }
+  },
+  "description": null,
+  "id": "WYi22QJ0fgncSzgC",
+  "name": "hub 178 - va/salesIq/message",
+  "nodeGroups": [],
+  "nodes": [
+    {
+      "id": "2bc04567-a96a-4cb5-bf3b-7a2d0ffc216a",
+      "name": "Handler",
+      "parameters": {
+        "options": {},
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "4f30d4f8-39ce-4699-8fa0-cb1f9e464a7e",
+                    "leftValue": "={{ $('SalesIQ - Intro').first().json.body.handler }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "trigger"
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                }
+              },
+              "outputKey": "Trigger",
+              "renameOutput": true
+            },
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "e060d82d-e461-46d1-aed3-877f615e8d5c",
+                    "leftValue": "={{ $('SalesIQ - Intro').first().json.body.handler }}",
+                    "operator": {
+                      "name": "filter.operator.equals",
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "message"
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                }
+              },
+              "outputKey": "Message",
+              "renameOutput": true
+            },
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "116c221d-f1ed-4816-948f-ab8d1bbc2a24",
+                    "leftValue": "={{ $('SalesIQ - Intro').first().json.body.handler }}",
+                    "operator": {
+                      "name": "filter.operator.equals",
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "failure"
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                }
+              },
+              "outputKey": "Failure",
+              "renameOutput": true
+            }
+          ]
+        }
+      },
+      "position": [
+        1216,
+        592
+      ],
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2
+    },
+    {
+      "id": "3b70ffe3-bb7b-4b90-b3db-7bfd321b87fc",
+      "name": "Response failure - pending",
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "72b29495-403a-43d8-94e1-d7a2807c4f6e",
+              "name": "action",
+              "type": "string",
+              "value": "pending"
+            },
+            {
+              "id": "ade9e90e-d175-421e-9147-5a77d8219b9d",
+              "name": "replies",
+              "type": "array",
+              "value": "={{ [`${$json.waintingTime}`] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "position": [
+        2144,
+        992
+      ],
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4
+    },
+    {
+      "id": "1ab611a9-a967-4387-bf19-b87a262a0ccd",
+      "name": "Failure Respond to Webhook",
+      "parameters": {
+        "options": {}
+      },
+      "position": [
+        2352,
+        992
+      ],
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1
+    },
+    {
+      "id": "e19a4b1b-9746-4b41-84f6-8d6f4a1939ba",
+      "name": "Failure - random phrase",
+      "parameters": {
+        "jsCode": "const phrases = {\n  \"en\": [\n    \"One moment, please\",\n    \"I need a moment\",\n    \"Give me a moment, please\",\n    \"Working on it, need a second\",\n    \"Please wait a moment\",\n    \"Checking now\",\n    \"I'll be right back\",\n    \"Please bear with me while I work on your request\",\n    \"Please hold on for a moment while I work on your request\",\n    \"I'll be right back, just a moment\",\n    \"I'll need a few seconds\",\n    \"Let me process this for you, just a moment please\",\n    \"I'm on it! This will only take a moment\",\n    \"Thanks for your patience, I'm working on it now\",\n    \"Hang tight! I'm pulling up the information for you\",\n    \"Just a sec, I'll have an update for you shortly\"\n  ],\n  \"es\": [\n    \"Un momento, por favor\",\n    \"Necesito un momento\",\n    \"Dame un momento, por favor\",\n    \"Trabajando en ello, un segundo\",\n    \"Espera un momento, por favor\",\n    \"Comprobando ahora\",\n    \"Vuelvo enseguida\",\n    \"Por favor, ten paciencia mientras trabajo en tu solicitud\",\n    \"Por favor, espera un momento mientras trabajo en tu solicitud\",\n    \"Vuelvo enseguida, solo un momento\",\n    \"NecesitarÃƒÂ© unos segundos\",\n    \"DÃƒÂ©jame procesar esto, un momento por favor\",\n    \"Estoy en ello, solo serÃƒÂ¡ un momento\",\n    \"Gracias por tu paciencia, estoy trabajando en ello ahora\",\n    \"Aguanta un momento, estoy buscando la informaciÃƒÂ³n para ti\",\n    \"Un segundo, te darÃƒÂ© una actualizaciÃƒÂ³n en breve\"\n  ],\n  \"fr\": [\n    \"Un instant, s'il vous plaÃƒÂ®t\",\n    \"J'ai besoin d'un moment\",\n    \"Donnez-moi un instant, s'il vous plaÃƒÂ®t\",\n    \"J'y travaille, une seconde\",\n    \"Veuillez patienter un instant\",\n    \"Je vÃƒÂ©rifie maintenant\",\n    \"Je reviens tout de suite\",\n    \"Merci de patienter pendant que je traite votre demande\",\n    \"Veuillez patienter pendant que je traite votre demande\",\n    \"Je reviens tout de suite, un instant\",\n    \"Il me faut quelques secondes\",\n    \"Laissez-moi traiter cela, un instant s'il vous plaÃƒÂ®t\",\n    \"Je m'en occupe, ce ne sera qu'un instant\",\n    \"Merci de votre patience, j'y travaille maintenant\",\n    \"Tenez bon, je rassemble les informations pour vous\",\n    \"Une seconde, j'aurai une mise ÃƒÂ  jour pour vous sous peu\"\n  ],\n  \"de\": [\n    \"Einen Moment, bitte\",\n    \"Ich brauche einen Moment\",\n    \"Geben Sie mir bitte einen Moment\",\n    \"Ich arbeite daran, eine Sekunde\",\n    \"Bitte warten Sie einen Moment\",\n    \"Ich prÃƒÂ¼fe das gerade\",\n    \"Ich bin gleich wieder da\",\n    \"Bitte haben Sie Geduld, wÃƒÂ¤hrend ich an Ihrer Anfrage arbeite\",\n    \"Bitte warten Sie einen Moment, wÃƒÂ¤hrend ich Ihre Anfrage bearbeite\",\n    \"Ich bin gleich wieder da, nur einen Moment\",\n    \"Ich brauche ein paar Sekunden\",\n    \"Lassen Sie mich das bearbeiten, einen Moment bitte\",\n    \"Ich kÃƒÂ¼mmere mich darum, es dauert nur einen Moment\",\n    \"Danke fÃƒÂ¼r Ihre Geduld, ich arbeite jetzt daran\",\n    \"Bleiben Sie dran, ich rufe die Informationen fÃƒÂ¼r Sie ab\",\n    \"Eine Sekunde, ich habe gleich ein Update fÃƒÂ¼r Sie\"\n  ],\n  \"it\": [\n    \"Un momento, per favore\",\n    \"Ho bisogno di un momento\",\n    \"Dammi un momento, per favore\",\n    \"Ci sto lavorando, un secondo\",\n    \"Attendi un momento, per favore\",\n    \"Sto controllando ora\",\n    \"Torno subito\",\n    \"Per favore, abbi pazienza mentre lavoro alla tua richiesta\",\n    \"Per favore, attendi un momento mentre elaboro la tua richiesta\",\n    \"Torno subito, solo un momento\",\n    \"Mi serviranno alcuni secondi\",\n    \"Lascia che lo elabori, un momento per favore\",\n    \"Ci penso io! Ci vorrÃƒÂ  solo un momento\",\n    \"Grazie per la pazienza, ci sto lavorando ora\",\n    \"Resisti! Sto recuperando le informazioni per te\",\n    \"Un secondo, ti darÃƒÂ² un aggiornamento a breve\"\n  ]\n};\n\nconst url = ($('SalesIQ - Intro').first()?.json?.body?.visitor?.current_page_url || '').toString();\nconst m = url.match(/\\/([a-z]{2})-([a-z]{2})\\//i);\nconst detected = m ? m[1].toLowerCase() : 'en';\nconst locale = phrases[detected] ? detected : 'en';\nconst pool = phrases[locale];\n\nconst waintingTime = pool[Math.floor(Math.random() * pool.length)];\n\nreturn [{ waintingTime }];\n"
+      },
+      "position": [
+        1920,
+        992
+      ],
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2
+    },
+    {
+      "id": "327ce287-77b6-48fa-8f62-8d81dad0b75c",
+      "name": "Trigger",
+      "parameters": {
+        "options": {},
+        "workflowId": {
+          "__rl": true,
+          "cachedResultName": "Handler - Trigger",
+          "cachedResultUrl": "/workflow/UTyFWYcHVRDZVeb3",
+          "mode": "list",
+          "value": "UTyFWYcHVRDZVeb3"
+        },
+        "workflowInputs": {
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true,
+          "mappingMode": "defineBelow",
+          "matchingColumns": [],
+          "schema": [
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "landing_page",
+              "id": "landing_page",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "project",
+              "id": "project",
+              "removed": false,
+              "required": false,
+              "type": "object"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "suggestions",
+              "id": "suggestions",
+              "removed": true,
+              "required": false,
+              "type": "object"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "sessionId",
+              "id": "sessionId",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "country_code",
+              "id": "country_code",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "ip",
+              "id": "ip",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "language",
+              "id": "language",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            }
+          ],
+          "value": {
+            "country_code": "={{ $('SalesIQ - Intro').first().json.body.visitor.country_code }}",
+            "ip": "={{ $('SalesIQ - Intro').first().json.body.visitor.ip }}",
+            "landing_page": "={{ $('SalesIQ - Intro').first().json.body.visitor.landing_page_url }}",
+            "language": "={{ (() => {\n  const url = ($('SalesIQ - Intro').first().json.body.visitor.current_page_url || '').toString();\n  const m = url.match(/\\/([a-z]{2})-([a-z]{2})\\//i);\n  const detected = m ? m[1].toLowerCase() : 'en';\n  return ['en','es','fr','de','it'].includes(detected) ? detected : 'en';\n})() }}",
+            "project": "={{ $('Get Project').first().json }}",
+            "sessionId": "={{ $('SalesIQ - Intro').first().json.body.visitor.uvid }}"
+          }
+        }
+      },
+      "position": [
+        2352,
+        256
+      ],
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2
+    },
+    {
+      "id": "8995ef48-a02c-4f0d-943d-de4f6c7e7854",
+      "name": "Respond - Trigger",
+      "parameters": {
+        "options": {},
+        "respondWith": "json",
+        "responseBody": "={{ $('Trigger').first().json }}"
+      },
+      "position": [
+        2640,
+        256
+      ],
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1
+    },
+    {
+      "id": "34e5dfcf-5ca8-41a3-ae52-6f9477812662",
+      "name": "Authorization",
+      "onError": "continueErrorOutput",
+      "parameters": {
+        "options": {},
+        "workflowId": {
+          "__rl": true,
+          "cachedResultName": "Authorization",
+          "cachedResultUrl": "/workflow/8XEeSCm1FsM1Um5T",
+          "mode": "list",
+          "value": "8XEeSCm1FsM1Um5T"
+        },
+        "workflowInputs": {
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true,
+          "mappingMode": "defineBelow",
+          "matchingColumns": [],
+          "schema": [],
+          "value": {}
+        }
+      },
+      "position": [
+        -160,
+        640
+      ],
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2
+    },
+    {
+      "id": "42a598ef-c4a0-4b04-91d1-1b6320dfba3c",
+      "name": "Log conversation id - message",
+      "parameters": {
+        "options": {
+          "waitForSubWorkflow": false
+        },
+        "workflowId": {
+          "__rl": true,
+          "cachedResultName": "Log conversation id",
+          "cachedResultUrl": "/workflow/s2gW479AbNRCX3ap",
+          "mode": "list",
+          "value": "s2gW479AbNRCX3ap"
+        },
+        "workflowInputs": {
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true,
+          "mappingMode": "defineBelow",
+          "matchingColumns": [],
+          "schema": [
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "conversation_id",
+              "id": "conversation_id",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "sessionId",
+              "id": "sessionId",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            }
+          ],
+          "value": {
+            "conversation_id": "={{ $('SalesIQ - Intro').first().json.body.visitor.active_conversation_id }}",
+            "sessionId": "={{ $('SalesIQ - Intro').first().json.body.visitor.uvid }}"
+          }
+        }
+      },
+      "position": [
+        2640,
+        416
+      ],
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2
+    },
+    {
+      "id": "d387e037-9522-4a2a-a585-82f3a6c9c0c5",
+      "name": "Failure",
+      "parameters": {
+        "options": {
+          "waitForSubWorkflow": false
+        },
+        "workflowId": {
+          "__rl": true,
+          "cachedResultName": "Handler - Failure",
+          "cachedResultUrl": "/workflow/6Hh3qZuh7TrfEulV",
+          "mode": "list",
+          "value": "6Hh3qZuh7TrfEulV"
+        },
+        "workflowInputs": {
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true,
+          "mappingMode": "defineBelow",
+          "matchingColumns": [],
+          "schema": [
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "sessionId",
+              "id": "sessionId",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "request_id",
+              "id": "request_id",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            }
+          ],
+          "value": {
+            "request_id": "={{ $('SalesIQ - Intro').first().json.body.request.id }}",
+            "sessionId": "={{ $('SalesIQ - Intro').first().json.body.visitor.uvid }}"
+          }
+        }
+      },
+      "position": [
+        2640,
+        992
+      ],
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2
+    },
+    {
+      "id": "d4a51e81-470e-4fa4-88a5-98ec9c3e5f38",
+      "name": "Failure handling",
+      "parameters": {
+        "options": {},
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "b7bb1177-8bc3-4cd3-a308-8e1d9aa2bea0",
+                    "leftValue": "={{ $('SalesIQ - Intro').first().json.body.cause.code }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "number"
+                    },
+                    "rightValue": 1005
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                }
+              },
+              "outputKey": "More than max length",
+              "renameOutput": true
+            },
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "bafdaa07-6c9c-4675-b138-d32a839222cb",
+                    "leftValue": "={{ $('SalesIQ - Intro').first().json.body.cause.code }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "number"
+                    },
+                    "rightValue": 1001
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                }
+              },
+              "outputKey": "Offline hours",
+              "renameOutput": true
+            },
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "0aaaa328-0819-48a6-868e-723d72139765",
+                    "leftValue": "={{ $('SalesIQ - Intro').first().json.body.cause.code }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "number"
+                    },
+                    "rightValue": 1002
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                }
+              },
+              "outputKey": "Operators not available",
+              "renameOutput": true
+            },
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "0b24dc24-8d18-444b-89ba-62547e275197",
+                    "leftValue": "={{ $('SalesIQ - Intro').first().json.body.cause.code }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "number"
+                    },
+                    "rightValue": 1003
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                }
+              },
+              "outputKey": "Invalid operators",
+              "renameOutput": true
+            },
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "cdd2163c-e3d8-48cb-a047-dcd1b4afb457",
+                    "leftValue": "={{ $('SalesIQ - Intro').first().json.body.cause.code }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "number"
+                    },
+                    "rightValue": 1007
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                }
+              },
+              "outputKey": "Execution failure",
+              "renameOutput": true
+            }
+          ]
+        }
+      },
+      "position": [
+        1440,
+        784
+      ],
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2
+    },
+    {
+      "alwaysOutputData": true,
+      "id": "5fb00345-2afa-4e68-8301-cd9d2647366c",
+      "name": "Post system message - Operators are busy",
+      "parameters": {
+        "options": {},
+        "workflowId": {
+          "__rl": true,
+          "cachedResultName": "Post message to chat memory",
+          "cachedResultUrl": "/workflow/RxG7Iqw6DZqqgUAT",
+          "mode": "list",
+          "value": "RxG7Iqw6DZqqgUAT"
+        },
+        "workflowInputs": {
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true,
+          "mappingMode": "defineBelow",
+          "matchingColumns": [],
+          "schema": [
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "attachments",
+              "id": "attachments",
+              "removed": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "sessionId",
+              "id": "sessionId",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "message",
+              "id": "message",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "type",
+              "id": "type",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            }
+          ],
+          "value": {
+            "message": "={{ \n$('Get settings').last().json.type === 'support'\n? \n\"No operator is available to take up the chat. Please proceed with escalation process and create a ticket\" \n: \n\"No operator is available to take up the chat. Ask client if he'd like to continue receiving assistance in chat or if he'd like to be contacted later with more information on his request. Afterwards, once you have information about what client wants and his expected resolution, use the tool 'initiate_support' which will handle the escalation process and create a ticket for the client's request. This way, a team member will follow-up on client's question.\"\n}} ",
+            "sessionId": "={{ $('SalesIQ - Intro').first().json.body.visitor.uvid }}",
+            "type": "system"
+          }
+        }
+      },
+      "position": [
+        2640,
+        800
+      ],
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2
+    },
+    {
+      "alwaysOutputData": true,
+      "id": "d89b3dff-16f9-44fe-a783-4502c16deb3b",
+      "name": "Post system message - Long text",
+      "parameters": {
+        "options": {},
+        "workflowId": {
+          "__rl": true,
+          "cachedResultName": "Post message to chat memory",
+          "cachedResultUrl": "/workflow/RxG7Iqw6DZqqgUAT",
+          "mode": "list",
+          "value": "RxG7Iqw6DZqqgUAT"
+        },
+        "workflowInputs": {
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true,
+          "mappingMode": "defineBelow",
+          "matchingColumns": [],
+          "schema": [
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "attachments",
+              "id": "attachments",
+              "removed": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "sessionId",
+              "id": "sessionId",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "message",
+              "id": "message",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "type",
+              "id": "type",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            }
+          ],
+          "value": {
+            "message": "Your last message is too long, make it shorter.",
+            "sessionId": "={{ $('SalesIQ - Intro').first().json.body.visitor.uvid }}",
+            "type": "system"
+          }
+        }
+      },
+      "position": [
+        2640,
+        608
+      ],
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2
+    },
+    {
+      "id": "71847fc4-2915-4f03-b0ec-27fa838dfb50",
+      "name": "Operators busy response",
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c0803ebd-a072-48f5-bdd9-a8345f6e4a38",
+              "name": "operators_busy_failure",
+              "type": "string",
+              "value": "={{ $json.success }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "position": [
+        2944,
+        704
+      ],
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4
+    },
+    {
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "hXZkgfuWSJSTX4OT",
+          "name": "Postgres"
+        }
+      },
+      "id": "65d628eb-7123-4749-b01d-d1618c13d8b0",
+      "name": "Get settings",
+      "parameters": {
+        "limit": 1,
+        "operation": "select",
+        "options": {
+          "outputColumns": [
+            "*"
+          ]
+        },
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "sort": {
+          "values": [
+            {
+              "column": "id",
+              "direction": "DESC"
+            }
+          ]
+        },
+        "table": {
+          "__rl": true,
+          "cachedResultName": "visitors_settings",
+          "mode": "list",
+          "value": "visitors_settings"
+        },
+        "where": {
+          "values": [
+            {
+              "column": "session_id",
+              "value": "={{ $('SalesIQ - Intro').first().json.body.visitor.uvid }}"
+            }
+          ]
+        }
+      },
+      "position": [
+        192,
+        624
+      ],
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6
+    },
+    {
+      "credentials": {
+        "postgres": {
+          "id": "hXZkgfuWSJSTX4OT",
+          "name": "Postgres"
+        }
+      },
+      "id": "00f2b18e-aefe-4ab3-b654-0bea7fdebff3",
+      "name": "Custom welcome - Update last message",
+      "parameters": {
+        "operation": "executeQuery",
+        "options": {
+          "queryReplacement": "={{ [(($('Trigger').first().json.replies) || []).map(r => r && r.text).filter(Boolean).join(String.fromCharCode(10)), ($('SalesIQ - Intro').first().json.body.visitor.uvid || $('SalesIQ - Intro').first().json.body.visitor.active_conversation_id)] }}"
+        },
+        "query": "UPDATE visitors_settings\nSET va_state = jsonb_set(\n      COALESCE(va_state, '{}'::jsonb),\n      '{last_opener}',\n      jsonb_build_object('text', $1::text, 'sent_at', NOW())\n    ),\n    updated_at = NOW()\nWHERE session_id = $2\nRETURNING id;"
+      },
+      "position": [
+        2928,
+        256
+      ],
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6
+    },
+    {
+      "credentials": {
+        "postgres": {
+          "id": "hXZkgfuWSJSTX4OT",
+          "name": "Postgres"
+        }
+      },
+      "id": "8318b2f7-8445-43f9-8937-725bf63257d8",
+      "name": "Get Project - first",
+      "parameters": {
+        "limit": 1,
+        "operation": "select",
+        "options": {},
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "cachedResultName": "projects",
+          "mode": "list",
+          "value": "projects"
+        },
+        "where": {
+          "values": [
+            {
+              "column": "app_id",
+              "value": "={{ $('SalesIQ - Intro').first().json.body.request.app_id }}"
+            }
+          ]
+        }
+      },
+      "position": [
+        592,
+        672
+      ],
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6
+    },
+    {
+      "credentials": {
+        "postgres": {
+          "id": "hXZkgfuWSJSTX4OT",
+          "name": "Postgres"
+        }
+      },
+      "id": "d5c6d8a6-971c-49d0-96a9-c140d7b826d8",
+      "name": "Get Project",
+      "parameters": {
+        "limit": 1,
+        "operation": "select",
+        "options": {},
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "cachedResultName": "projects",
+          "mode": "list",
+          "value": "projects"
+        },
+        "where": {
+          "values": [
+            {
+              "column": "app_id",
+              "value": "={{ $('SalesIQ - Intro').first().json.body.request.app_id }}"
+            }
+          ]
+        }
+      },
+      "position": [
+        2144,
+        256
+      ],
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6
+    },
+    {
+      "id": "60e795e0-abe4-417f-8a84-1b00963e8cd2",
+      "name": "Execution Data",
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "session_id",
+              "value": "={{ $json.body.visitor.uvid }}"
+            },
+            {
+              "key": "handler",
+              "value": "={{ $json.body.handler }}"
+            },
+            {
+              "key": "conversation_id",
+              "value": "={{ $json.body.visitor.active_conversation_id }}"
+            },
+            {
+              "key": "app_id",
+              "value": "={{ $json.body.request.app_id }}"
+            },
+            {
+              "key": "ut_anonymous_id",
+              "value": "={{ $json.body.visitor.custom_info.ut_anonymous_id }}"
+            }
+          ]
+        }
+      },
+      "position": [
+        -352,
+        640
+      ],
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1
+    },
+    {
+      "id": "aad1296d-5364-4435-be38-ef5b476f8177",
+      "name": "VARs",
+      "parameters": {
+        "variableNames": {
+          "variables": [
+            {
+              "name": "VAR_DEPARTMENT_ID_SALES"
+            },
+            {
+              "name": "VAR_APP_ID_ARANGRANT"
+            },
+            {
+              "name": "VAR_APP_ID_GURUFARE"
+            },
+            {
+              "name": "VAR_APP_ID_SKYMONDE"
+            },
+            {
+              "name": "VAR_APP_ID_OVAGO"
+            },
+            {
+              "name": "VAR_APP_ID_BUSINESSCLASS"
+            },
+            {
+              "name": "VAR_FACEBOOK_API_URL"
+            },
+            {
+              "name": "VAR_PII_EMAIL_REGEX"
+            },
+            {
+              "name": "VAR_PII_PHONE_REGEX"
+            },
+            {
+              "name": "VAR_PROJECTS"
+            },
+            {
+              "name": "VAR_ENV"
+            },
+            {
+              "name": "VAR_SALESIQ_API_V2_URL"
+            }
+          ]
+        }
+      },
+      "position": [
+        -352,
+        512
+      ],
+      "type": "CUSTOM.variablesNode",
+      "typeVersion": 1
+    },
+    {
+      "id": "f380176c-a5c7-44b3-a2f7-637644c53d0e",
+      "name": "Respond to Webhook1",
+      "parameters": {
+        "options": {
+          "responseCode": 401
+        }
+      },
+      "position": [
+        32,
+        704
+      ],
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1
+    },
+    {
+      "credentials": {
+        "postgres": {
+          "id": "hXZkgfuWSJSTX4OT",
+          "name": "Postgres"
+        }
+      },
+      "id": "e5f21e2c-26b3-482a-b200-69c1790a9eed",
+      "name": "PII Decrypt",
+      "parameters": {
+        "table_name": "pii_data",
+        "text": "={{ $json.response }}",
+        "unique_id": "={{ $('SalesIQ - Intro').first().json.body.visitor.uvid }}"
+      },
+      "position": [
+        5376,
+        688
+      ],
+      "type": "CUSTOM.PiiDecryptNode",
+      "typeVersion": 1
+    },
+    {
+      "id": "a10540ab-d329-452c-a402-622880be9d6e",
+      "name": "Sticky Note",
+      "parameters": {
+        "content": "# VA",
+        "height": 368,
+        "width": 1504
+      },
+      "position": [
+        3568,
+        544
+      ],
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1
+    },
+    {
+      "id": "77f46e75-70e8-4cf1-ba2c-3ab0bcb2c4a8",
+      "name": "Sticky Note1",
+      "parameters": {
+        "content": "# INPUT",
+        "height": 384,
+        "width": 1792
+      },
+      "position": [
+        -656,
+        480
+      ],
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1
+    },
+    {
+      "id": "b6acdb55-42c4-4952-a105-bc613dc09d99",
+      "name": "SalesIQ - Intro",
+      "parameters": {
+        "httpMethod": "POST",
+        "options": {
+          "rawBody": true
+        },
+        "path": "va-v3/message/send",
+        "responseMode": "responseNode"
+      },
+      "position": [
+        -592,
+        640
+      ],
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "webhookId": "c2f96a29-5bbd-4cd1-ae4e-4e561f5078cf"
+    },
+    {
+      "credentials": {
+        "postgres": {
+          "id": "hXZkgfuWSJSTX4OT",
+          "name": "Postgres"
+        }
+      },
+      "id": "7818b419-3e03-4779-a681-d1cfac47d21c",
+      "name": "Delete last message",
+      "parameters": {
+        "columns": {
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false,
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "session_id"
+          ],
+          "schema": [
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": true,
+              "display": true,
+              "displayName": "id",
+              "id": "id",
+              "removed": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "session_id",
+              "id": "session_id",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "created_at",
+              "id": "created_at",
+              "removed": true,
+              "required": false,
+              "type": "dateTime"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "updated_at",
+              "id": "updated_at",
+              "removed": false,
+              "required": false,
+              "type": "dateTime"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "chatinfo_data",
+              "id": "chatinfo_data",
+              "removed": true,
+              "required": false,
+              "type": "object"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "checkout_data",
+              "id": "checkout_data",
+              "removed": true,
+              "required": false,
+              "type": "object"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "project",
+              "id": "project",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "validation",
+              "id": "validation",
+              "removed": true,
+              "required": false,
+              "type": "boolean"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "lead_id",
+              "id": "lead_id",
+              "removed": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "last_message",
+              "id": "last_message",
+              "removed": false,
+              "required": false,
+              "type": "object"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "type",
+              "id": "type",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "contactUs_url",
+              "id": "contactUs_url",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "language",
+              "id": "language",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "booking_identifier",
+              "id": "booking_identifier",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "case_id",
+              "id": "case_id",
+              "removed": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "selected_quote_key",
+              "id": "selected_quote_key",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "more_option_iteration",
+              "id": "more_option_iteration",
+              "removed": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "last_message_full",
+              "id": "last_message_full",
+              "removed": true,
+              "required": false,
+              "type": "object"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "conversations_count",
+              "id": "conversations_count",
+              "removed": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "active_tool",
+              "id": "active_tool",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "validated_orders",
+              "id": "validated_orders",
+              "removed": true,
+              "required": false,
+              "type": "array"
+            }
+          ],
+          "value": {
+            "last_message": "={{ null }}",
+            "session_id": "={{ $('SalesIQ - Intro').first().json.body.visitor.uvid }}",
+            "updated_at": "={{ $now }}"
+          }
+        },
+        "operation": "update",
+        "options": {},
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "cachedResultName": "visitors_settings",
+          "mode": "list",
+          "value": "visitors_settings"
+        }
+      },
+      "position": [
+        3136,
+        704
+      ],
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6
+    },
+    {
+      "id": "b452f641-009f-421b-afc7-0b0b5021f248",
+      "name": "Sticky Note4",
+      "parameters": {
+        "content": "# OUTPUT",
+        "height": 992,
+        "width": 1616
+      },
+      "position": [
+        5120,
+        368
+      ],
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1
+    },
+    {
+      "id": "90350b66-1454-495f-81aa-8bb1bb40b6ce",
+      "name": "Error Respond",
+      "parameters": {
+        "options": {},
+        "respondWith": "json",
+        "responseBody": "={{ $json.last_message }}"
+      },
+      "position": [
+        5824,
+        928
+      ],
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1
+    },
+    {
+      "id": "f209a487-004f-44e2-8dd1-71aa1b3bb0be",
+      "name": "Support - Stop and Error",
+      "parameters": {
+        "errorMessage": "=Support Error Update Failed"
+      },
+      "position": [
+        5824,
+        1120
+      ],
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1
+    },
+    {
+      "credentials": {
+        "postgres": {
+          "id": "hXZkgfuWSJSTX4OT",
+          "name": "Postgres"
+        }
+      },
+      "id": "801b294d-e5fd-4759-a105-21bdab65c95e",
+      "name": "Support Error - Update last message",
+      "parameters": {
+        "columns": {
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false,
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "session_id"
+          ],
+          "schema": [
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": true,
+              "display": true,
+              "displayName": "id",
+              "id": "id",
+              "removed": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "session_id",
+              "id": "session_id",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "created_at",
+              "id": "created_at",
+              "removed": true,
+              "required": false,
+              "type": "dateTime"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "updated_at",
+              "id": "updated_at",
+              "removed": false,
+              "required": false,
+              "type": "dateTime"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "chatinfo_data",
+              "id": "chatinfo_data",
+              "removed": true,
+              "required": false,
+              "type": "object"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "checkout_data",
+              "id": "checkout_data",
+              "removed": true,
+              "required": false,
+              "type": "object"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "project",
+              "id": "project",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "validation",
+              "id": "validation",
+              "removed": true,
+              "required": false,
+              "type": "boolean"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "lead_id",
+              "id": "lead_id",
+              "removed": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "last_message",
+              "id": "last_message",
+              "removed": false,
+              "required": false,
+              "type": "object"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "type",
+              "id": "type",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "contactUs_url",
+              "id": "contactUs_url",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "language",
+              "id": "language",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "booking_identifier",
+              "id": "booking_identifier",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "case_id",
+              "id": "case_id",
+              "removed": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "selected_quote_key",
+              "id": "selected_quote_key",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "more_option_iteration",
+              "id": "more_option_iteration",
+              "removed": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "last_message_full",
+              "id": "last_message_full",
+              "removed": true,
+              "required": false,
+              "type": "object"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "conversations_count",
+              "id": "conversations_count",
+              "removed": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "active_tool",
+              "id": "active_tool",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "validated_orders",
+              "id": "validated_orders",
+              "removed": true,
+              "required": false,
+              "type": "array"
+            }
+          ],
+          "value": {
+            "last_message": "={{ $('Error Payload').first().json }}",
+            "session_id": "={{ $('SalesIQ - Intro').first().json.body.visitor.uvid }}",
+            "updated_at": "={{ $now }}"
+          }
+        },
+        "operation": "update",
+        "options": {},
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "cachedResultName": "visitors_settings",
+          "mode": "list",
+          "value": "visitors_settings"
+        }
+      },
+      "position": [
+        5568,
+        928
+      ],
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6
+    },
+    {
+      "id": "6c259b3a-b5fd-4de6-8653-af7cf4790356",
+      "name": "success",
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "3f2f3c15-0f5a-4bbb-9b79-02ecb63ef6fa",
+              "leftValue": "={{ $('virtual_agent').first().json.success }}",
+              "operator": {
+                "operation": "true",
+                "singleValue": true,
+                "type": "boolean"
+              },
+              "rightValue": false
+            }
+          ],
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          }
+        },
+        "options": {}
+      },
+      "position": [
+        5152,
+        704
+      ],
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3
+    },
+    {
+      "id": "2f77338a-40b7-4acf-9424-59c95227f6ac",
+      "name": "Error Payload",
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fdf815a5-e5b2-420a-9957-f7fefd19296c",
+              "name": "action",
+              "type": "string",
+              "value": "end"
+            },
+            {
+              "id": "9b954fa5-79c1-4797-88cd-3eac85f440d7",
+              "name": "replies",
+              "type": "array",
+              "value": "={{ [{\"text\":\"Sorry, I am unable to provide assistance at the moment.\"}, {\"text\":`Please try starting a new chat or reach out to us using the contact details from the [Contact Us](${$('Get settings').last().json.contactUs_url}) page.`}] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "position": [
+        5376,
+        928
+      ],
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4
+    },
+    {
+      "credentials": {
+        "postgres": {
+          "id": "hXZkgfuWSJSTX4OT",
+          "name": "Postgres"
+        }
+      },
+      "id": "e3fbc8be-a6f7-489b-9a97-3121fae7c3f1",
+      "name": "Update request_id",
+      "notes": "visitor_settings",
+      "notesInFlow": true,
+      "parameters": {
+        "columns": {
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false,
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "session_id"
+          ],
+          "schema": [
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": true,
+              "display": true,
+              "displayName": "id",
+              "id": "id",
+              "removed": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "session_id",
+              "id": "session_id",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "created_at",
+              "id": "created_at",
+              "removed": true,
+              "required": false,
+              "type": "dateTime"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "updated_at",
+              "id": "updated_at",
+              "removed": true,
+              "required": false,
+              "type": "dateTime"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "chatinfo_data",
+              "id": "chatinfo_data",
+              "removed": true,
+              "required": false,
+              "type": "object"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "checkout_data",
+              "id": "checkout_data",
+              "removed": true,
+              "required": false,
+              "type": "object"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "project",
+              "id": "project",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "validation",
+              "id": "validation",
+              "removed": true,
+              "required": false,
+              "type": "boolean"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "lead_id",
+              "id": "lead_id",
+              "removed": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "last_message",
+              "id": "last_message",
+              "removed": true,
+              "required": false,
+              "type": "object"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "type",
+              "id": "type",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "contactUs_url",
+              "id": "contactUs_url",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "language",
+              "id": "language",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "booking_identifier",
+              "id": "booking_identifier",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "case_id",
+              "id": "case_id",
+              "removed": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "selected_quote_key",
+              "id": "selected_quote_key",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "last_message_full",
+              "id": "last_message_full",
+              "removed": true,
+              "required": false,
+              "type": "object"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "more_option_iteration",
+              "id": "more_option_iteration",
+              "removed": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "is_whatsapp",
+              "id": "is_whatsapp",
+              "removed": true,
+              "required": false,
+              "type": "boolean"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "last_conversation_id",
+              "id": "last_conversation_id",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "wa_hash",
+              "id": "wa_hash",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "wa_ticket_ulid",
+              "id": "wa_ticket_ulid",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "masked_client_phone",
+              "id": "masked_client_phone",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "last_template_sent_at",
+              "id": "last_template_sent_at",
+              "removed": true,
+              "required": false,
+              "type": "dateTime"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "validated_orders",
+              "id": "validated_orders",
+              "removed": true,
+              "required": false,
+              "type": "array"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "request_id",
+              "id": "request_id",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "conversation_id",
+              "id": "conversation_id",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "order_tickets",
+              "id": "order_tickets",
+              "removed": true,
+              "required": false,
+              "type": "object"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "request_type",
+              "id": "request_type",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "journey_stage",
+              "id": "journey_stage",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "va_state",
+              "id": "va_state",
+              "removed": true,
+              "required": false,
+              "type": "object"
+            }
+          ],
+          "value": {
+            "conversation_id": "={{ $('SalesIQ - Intro').first().json.body.visitor.active_conversation_id }}",
+            "request_id": "={{ $('SalesIQ - Intro').first().json.body.request.id }}",
+            "session_id": "={{ $('SalesIQ - Intro').first().json.body.visitor.uvid }}"
+          }
+        },
+        "operation": "update",
+        "options": {},
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "name",
+          "value": "visitors_settings"
+        }
+      },
+      "position": [
+        3328,
+        704
+      ],
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6
+    },
+    {
+      "id": "a7ac94c5-d254-40f2-bca2-2ac9f1d549e6",
+      "name": "search_quotes started",
+      "parameters": {
+        "conditions": {
+          "combinator": "or",
+          "conditions": [
+            {
+              "id": "89931c76-f923-4e06-900d-e898045c6b20",
+              "leftValue": "={{ $('virtual_agent').first().json.data.search_quotes_started }}",
+              "operator": {
+                "operation": "true",
+                "singleValue": true,
+                "type": "boolean"
+              },
+              "rightValue": ""
+            }
+          ],
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          }
+        },
+        "options": {}
+      },
+      "position": [
+        5568,
+        688
+      ],
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3
+    },
+    {
+      "id": "fdefc4ff-781e-46b4-8aa0-d5af537ab104",
+      "name": "Response failure - pending1",
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "72b29495-403a-43d8-94e1-d7a2807c4f6e",
+              "name": "action",
+              "type": "string",
+              "value": "pending"
+            },
+            {
+              "id": "ade9e90e-d175-421e-9147-5a77d8219b9d",
+              "name": "replies",
+              "type": "array",
+              "value": "={{ [`${$json.waintingTime}`] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "position": [
+        2144,
+        800
+      ],
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4
+    },
+    {
+      "id": "f072d718-73be-42d7-9911-1486c118aea0",
+      "name": "Failure Respond to Webhook1",
+      "parameters": {
+        "options": {}
+      },
+      "position": [
+        2352,
+        800
+      ],
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1
+    },
+    {
+      "id": "25544cf6-7355-4679-8b3b-11f4800a45ee",
+      "name": "Failure - random phrase1",
+      "parameters": {
+        "jsCode": "const phrases = {\n  \"en\": [\n    \"One moment, please\",\n    \"I need a moment\",\n    \"Give me a moment, please\",\n    \"Working on it, need a second\",\n    \"Please wait a moment\",\n    \"Checking now\",\n    \"I'll be right back\",\n    \"I'll be right back, just a moment\",\n    \"I'll need a few seconds\",\n    \"I'm on it! This will only take a moment\",\n    \"Thanks for your patience, I'm working on it now\",\n    \"Just a sec, I'll have an update for you shortly\"\n  ],\n  \"es\": [\n    \"Un momento, por favor\",\n    \"Necesito un momento\",\n    \"Dame un momento, por favor\",\n    \"Trabajando en ello, un segundo\",\n    \"Espera un momento, por favor\",\n    \"Comprobando ahora\",\n    \"Vuelvo enseguida\",\n    \"Vuelvo enseguida, solo un momento\",\n    \"NecesitarÃƒÂ© unos segundos\",\n    \"Estoy en ello, solo serÃƒÂ¡ un momento\",\n    \"Gracias por tu paciencia, estoy trabajando en ello ahora\",\n    \"Un segundo, te darÃƒÂ© una actualizaciÃƒÂ³n en breve\"\n  ],\n  \"fr\": [\n    \"Un instant, s'il vous plaÃƒÂ®t\",\n    \"J'ai besoin d'un moment\",\n    \"Donnez-moi un instant, s'il vous plaÃƒÂ®t\",\n    \"J'y travaille, une seconde\",\n    \"Veuillez patienter un instant\",\n    \"Je vÃƒÂ©rifie maintenant\",\n    \"Je reviens tout de suite\",\n    \"Je reviens tout de suite, un instant\",\n    \"Il me faut quelques secondes\",\n    \"Je m'en occupe, ce ne sera qu'un instant\",\n    \"Merci de votre patience, j'y travaille maintenant\",\n    \"Une seconde, j'aurai une mise ÃƒÂ  jour pour vous sous peu\"\n  ],\n  \"de\": [\n    \"Einen Moment, bitte\",\n    \"Ich brauche einen Moment\",\n    \"Geben Sie mir bitte einen Moment\",\n    \"Ich arbeite daran, eine Sekunde\",\n    \"Bitte warten Sie einen Moment\",\n    \"Ich prÃƒÂ¼fe das gerade\",\n    \"Ich bin gleich wieder da\",\n    \"Ich bin gleich wieder da, nur einen Moment\",\n    \"Ich brauche ein paar Sekunden\",\n    \"Ich kÃƒÂ¼mmere mich darum, es dauert nur einen Moment\",\n    \"Danke fÃƒÂ¼r Ihre Geduld, ich arbeite jetzt daran\",\n    \"Eine Sekunde, ich habe gleich ein Update fÃƒÂ¼r Sie\"\n  ],\n  \"it\": [\n    \"Un momento, per favore\",\n    \"Ho bisogno di un momento\",\n    \"Dammi un momento, per favore\",\n    \"Ci sto lavorando, un secondo\",\n    \"Attendi un momento, per favore\",\n    \"Sto controllando ora\",\n    \"Torno subito\",\n    \"Torno subito, solo un momento\",\n    \"Mi serviranno alcuni secondi\",\n    \"Ci penso io! Ci vorrÃƒÂ  solo un momento\",\n    \"Grazie per la pazienza, ci sto lavorando ora\",\n    \"Un secondo, ti darÃƒÂ² un aggiornamento a breve\"\n  ]\n};\n\nconst url = ($('SalesIQ - Intro').first()?.json?.body?.visitor?.current_page_url || '').toString();\nconst m = url.match(/\\/([a-z]{2})-([a-z]{2})\\//i);\nconst detected = m ? m[1].toLowerCase() : 'en';\nconst locale = phrases[detected] ? detected : 'en';\nconst pool = phrases[locale];\n\nconst waintingTime = pool[Math.floor(Math.random() * pool.length)];\n\nreturn [{ waintingTime }];\n"
+      },
+      "position": [
+        1920,
+        800
+      ],
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2
+    },
+    {
+      "executeOnce": true,
+      "id": "2de8b78c-f013-4540-9c42-874eab9d82da",
+      "name": "Respond",
+      "parameters": {
+        "options": {},
+        "respondWith": "json",
+        "responseBody": "={{\n  {\n    \"action\":\"reply\",\n    \"replies\": [{\"text\":$('PII Decrypt').first().json.text}],\n    \"suggestions\": $('virtual_agent').first().json.suggestions\n  }\n}}"
+      },
+      "position": [
+        6320,
+        992
+      ],
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1
+    },
+    {
+      "credentials": {
+        "postgres": {
+          "id": "hXZkgfuWSJSTX4OT",
+          "name": "Postgres"
+        }
+      },
+      "id": "56825d60-71d4-4d71-afd6-279d51458109",
+      "name": "Update last message",
+      "parameters": {
+        "columns": {
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false,
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "session_id"
+          ],
+          "schema": [
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": true,
+              "display": true,
+              "displayName": "id",
+              "id": "id",
+              "removed": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "session_id",
+              "id": "session_id",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "created_at",
+              "id": "created_at",
+              "removed": true,
+              "required": false,
+              "type": "dateTime"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "updated_at",
+              "id": "updated_at",
+              "removed": false,
+              "required": false,
+              "type": "dateTime"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "chatinfo_data",
+              "id": "chatinfo_data",
+              "removed": true,
+              "required": false,
+              "type": "object"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "checkout_data",
+              "id": "checkout_data",
+              "removed": true,
+              "required": false,
+              "type": "object"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "project",
+              "id": "project",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "validation",
+              "id": "validation",
+              "removed": true,
+              "required": false,
+              "type": "boolean"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "lead_id",
+              "id": "lead_id",
+              "removed": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "last_message",
+              "id": "last_message",
+              "required": false,
+              "type": "object"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "type",
+              "id": "type",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "contactUs_url",
+              "id": "contactUs_url",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "language",
+              "id": "language",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "booking_identifier",
+              "id": "booking_identifier",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "case_id",
+              "id": "case_id",
+              "removed": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "selected_quote_key",
+              "id": "selected_quote_key",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "more_option_iteration",
+              "id": "more_option_iteration",
+              "removed": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "last_message_full",
+              "id": "last_message_full",
+              "removed": true,
+              "required": false,
+              "type": "object"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "conversations_count",
+              "id": "conversations_count",
+              "removed": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "active_tool",
+              "id": "active_tool",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "validated_orders",
+              "id": "validated_orders",
+              "removed": true,
+              "required": false,
+              "type": "array"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "is_whatsapp",
+              "id": "is_whatsapp",
+              "removed": true,
+              "required": false,
+              "type": "boolean"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "last_conversation_id",
+              "id": "last_conversation_id",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "wa_hash",
+              "id": "wa_hash",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "wa_ticket_ulid",
+              "id": "wa_ticket_ulid",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "masked_client_phone",
+              "id": "masked_client_phone",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            }
+          ],
+          "value": {
+            "last_message": "={{\n  {\n    \"action\": \"forward\",\n    \"replies\": [{\"text\":$('PII Decrypt').first().json.text}],\n    \"department\": $('VARs').first().json.VAR_DEPARTMENT_ID_SALES \n  }\n}}",
+            "session_id": "={{ $('SalesIQ - Intro').first().json.body.visitor.uvid }}",
+            "updated_at": "={{ $now }}"
+          }
+        },
+        "operation": "update",
+        "options": {},
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "cachedResultName": "visitors_settings",
+          "mode": "list",
+          "value": "visitors_settings"
+        }
+      },
+      "position": [
+        6096,
+        608
+      ],
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6
+    },
+    {
+      "id": "8737dbfc-e8c4-4620-bfd1-79c35afce2bc",
+      "name": "Forward",
+      "parameters": {
+        "options": {},
+        "respondWith": "json",
+        "responseBody": "={{\n{\n    \"action\": \"forward\",\n    \"replies\": [{\"text\":$('PII Decrypt').first().json.text}],\n    \"department\": $('VARs').first().json.VAR_DEPARTMENT_ID_SALES \n  }\n}}"
+      },
+      "position": [
+        6320,
+        608
+      ],
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1
+    },
+    {
+      "id": "730e8164-938b-4ce2-b9fb-e94afd08344a",
+      "name": "Action to do",
+      "parameters": {
+        "options": {},
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "10465988-10ed-4c9f-bef1-67133b76aa8c",
+                    "leftValue": "={{ $('virtual_agent').first().json.data.end_conversation }}",
+                    "operator": {
+                      "operation": "true",
+                      "singleValue": true,
+                      "type": "boolean"
+                    },
+                    "rightValue": ""
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                }
+              },
+              "outputKey": "close",
+              "renameOutput": true
+            },
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "d2af170a-7277-4c66-98a9-a598bdcfb016",
+                    "leftValue": "={{ $('virtual_agent').first().json.data.transfer_to_chat_sales }}",
+                    "operator": {
+                      "operation": "true",
+                      "singleValue": true,
+                      "type": "boolean"
+                    },
+                    "rightValue": ""
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                }
+              },
+              "outputKey": "transfer",
+              "renameOutput": true
+            },
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "6c84b406-1678-4dbf-b2af-ee1eddba805d",
+                    "leftValue": "={{ $('virtual_agent').first().json.body.cause.code }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "number"
+                    },
+                    "rightValue": 1002
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                }
+              },
+              "outputKey": "no operators",
+              "renameOutput": true
+            },
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "5183bae4-ede8-4d7f-88a0-2548842f82e1",
+                    "leftValue": "={{ \n$('virtual_agent').first().json.data.transfer_to_chat_sales === false\n&&\n$('virtual_agent').first().json.data.end_conversation === false\n}}",
+                    "operator": {
+                      "operation": "true",
+                      "singleValue": true,
+                      "type": "boolean"
+                    },
+                    "rightValue": ""
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                }
+              },
+              "outputKey": "respond",
+              "renameOutput": true
+            }
+          ]
+        }
+      },
+      "position": [
+        5824,
+        672
+      ],
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4
+    },
+    {
+      "id": "414c9bca-0c3d-453e-bcb5-09c25689651d",
+      "name": "Close",
+      "parameters": {
+        "options": {},
+        "respondWith": "json",
+        "responseBody": "={{\n{\n\"action\":\"end\",\n\"replies\": [{\"text\":$('PII Decrypt').first().json.text}]\n}\n}}"
+      },
+      "position": [
+        6320,
+        416
+      ],
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1
+    },
+    {
+      "id": "5cb298d6-c474-4849-95c3-12dd2b0e362c",
+      "name": "Save event to Click-House Close",
+      "parameters": {
+        "options": {
+          "waitForSubWorkflow": false
+        },
+        "workflowId": {
+          "__rl": true,
+          "cachedResultName": "Save event to Click-House",
+          "cachedResultUrl": "/workflow/DjSkNEWzR4gyM-wUTyJSN",
+          "mode": "list",
+          "value": "DjSkNEWzR4gyM-wUTyJSN"
+        },
+        "workflowInputs": {
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true,
+          "mappingMode": "defineBelow",
+          "matchingColumns": [],
+          "schema": [
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "meta.schemaVersion",
+              "id": "meta.schemaVersion",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "meta.time",
+              "id": "meta.time",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "meta.id",
+              "id": "meta.id",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "meta.type",
+              "id": "meta.type",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "meta.typeSchemaVersion",
+              "id": "meta.typeSchemaVersion",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "meta.producer.id",
+              "id": "meta.producer.id",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "meta.application.id",
+              "id": "meta.application.id",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "meta.application.instance",
+              "id": "meta.application.instance",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "meta.application.env",
+              "id": "meta.application.env",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "data",
+              "id": "data",
+              "removed": false,
+              "required": false,
+              "type": "object"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "execution",
+              "id": "execution",
+              "removed": false,
+              "required": false,
+              "type": "object"
+            }
+          ],
+          "value": {
+            "data": "={{ \n{\n    \"response\": \"Conversation closed\",\n    \"success\": true\n  }\n}}",
+            "execution": "={{ \n    {\n      \"workflow_id\": $workflow.id,\n      \"execution_id\": $execution.id,\n      \"workflow_name\": $workflow.name,\n      \"mode\": $execution.mode\n    }\n}}",
+            "meta.application.env": "={{ $('VARs').first().json.VAR_ENV }}",
+            "meta.application.id": "n8n",
+            "meta.application.instance": "=882108c5edd95f9ba914c9588997017c62bfce83c80922bd8ad4223698e3d9f3",
+            "meta.producer.id": "virtual_agent",
+            "meta.schemaVersion": "1.0.0",
+            "meta.time": "={{ $now.toUTC() }}",
+            "meta.type": "va/outputProcessing/conversation/closed",
+            "meta.typeSchemaVersion": "1.0.0"
+          }
+        }
+      },
+      "position": [
+        6544,
+        416
+      ],
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3
+    },
+    {
+      "credentials": {
+        "postgres": {
+          "id": "hXZkgfuWSJSTX4OT",
+          "name": "Postgres"
+        }
+      },
+      "id": "789dcaa6-f3df-412b-8c66-d48fea870240",
+      "name": "Update last message1",
+      "parameters": {
+        "columns": {
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false,
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "session_id"
+          ],
+          "schema": [
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": true,
+              "display": true,
+              "displayName": "id",
+              "id": "id",
+              "removed": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "session_id",
+              "id": "session_id",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "created_at",
+              "id": "created_at",
+              "removed": true,
+              "required": false,
+              "type": "dateTime"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "updated_at",
+              "id": "updated_at",
+              "removed": false,
+              "required": false,
+              "type": "dateTime"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "chatinfo_data",
+              "id": "chatinfo_data",
+              "removed": true,
+              "required": false,
+              "type": "object"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "checkout_data",
+              "id": "checkout_data",
+              "removed": true,
+              "required": false,
+              "type": "object"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "project",
+              "id": "project",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "validation",
+              "id": "validation",
+              "removed": true,
+              "required": false,
+              "type": "boolean"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "lead_id",
+              "id": "lead_id",
+              "removed": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "last_message",
+              "id": "last_message",
+              "required": false,
+              "type": "object"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "type",
+              "id": "type",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "contactUs_url",
+              "id": "contactUs_url",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "language",
+              "id": "language",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "booking_identifier",
+              "id": "booking_identifier",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "case_id",
+              "id": "case_id",
+              "removed": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "selected_quote_key",
+              "id": "selected_quote_key",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "more_option_iteration",
+              "id": "more_option_iteration",
+              "removed": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "last_message_full",
+              "id": "last_message_full",
+              "removed": true,
+              "required": false,
+              "type": "object"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "conversations_count",
+              "id": "conversations_count",
+              "removed": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "active_tool",
+              "id": "active_tool",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "validated_orders",
+              "id": "validated_orders",
+              "removed": true,
+              "required": false,
+              "type": "array"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "is_whatsapp",
+              "id": "is_whatsapp",
+              "removed": true,
+              "required": false,
+              "type": "boolean"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "last_conversation_id",
+              "id": "last_conversation_id",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "wa_hash",
+              "id": "wa_hash",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "wa_ticket_ulid",
+              "id": "wa_ticket_ulid",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "masked_client_phone",
+              "id": "masked_client_phone",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            }
+          ],
+          "value": {
+            "last_message": "={{\n{\n\"action\":\"end\",\n\"replies\": [{\"text\":$('PII Decrypt').first().json.text}]\n}\n}}",
+            "session_id": "={{ $('SalesIQ - Intro').first().json.body.visitor.uvid }}",
+            "updated_at": "={{ $now }}"
+          }
+        },
+        "operation": "update",
+        "options": {},
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "cachedResultName": "visitors_settings",
+          "mode": "list",
+          "value": "visitors_settings"
+        }
+      },
+      "position": [
+        6096,
+        416
+      ],
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6
+    },
+    {
+      "credentials": {
+        "postgres": {
+          "id": "hXZkgfuWSJSTX4OT",
+          "name": "Postgres"
+        }
+      },
+      "id": "af45ed92-6f7e-486c-88ea-d2610fcc17a5",
+      "name": "Update last message2",
+      "parameters": {
+        "columns": {
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false,
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "session_id"
+          ],
+          "schema": [
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": true,
+              "display": true,
+              "displayName": "id",
+              "id": "id",
+              "removed": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "session_id",
+              "id": "session_id",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "created_at",
+              "id": "created_at",
+              "removed": true,
+              "required": false,
+              "type": "dateTime"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "updated_at",
+              "id": "updated_at",
+              "removed": false,
+              "required": false,
+              "type": "dateTime"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "chatinfo_data",
+              "id": "chatinfo_data",
+              "removed": true,
+              "required": false,
+              "type": "object"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "checkout_data",
+              "id": "checkout_data",
+              "removed": true,
+              "required": false,
+              "type": "object"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "project",
+              "id": "project",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "validation",
+              "id": "validation",
+              "removed": true,
+              "required": false,
+              "type": "boolean"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "lead_id",
+              "id": "lead_id",
+              "removed": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "last_message",
+              "id": "last_message",
+              "required": false,
+              "type": "object"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "type",
+              "id": "type",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "contactUs_url",
+              "id": "contactUs_url",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "language",
+              "id": "language",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "booking_identifier",
+              "id": "booking_identifier",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "case_id",
+              "id": "case_id",
+              "removed": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "selected_quote_key",
+              "id": "selected_quote_key",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "more_option_iteration",
+              "id": "more_option_iteration",
+              "removed": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "last_message_full",
+              "id": "last_message_full",
+              "removed": true,
+              "required": false,
+              "type": "object"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "conversations_count",
+              "id": "conversations_count",
+              "removed": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "active_tool",
+              "id": "active_tool",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "validated_orders",
+              "id": "validated_orders",
+              "removed": true,
+              "required": false,
+              "type": "array"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "is_whatsapp",
+              "id": "is_whatsapp",
+              "removed": true,
+              "required": false,
+              "type": "boolean"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "last_conversation_id",
+              "id": "last_conversation_id",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "wa_hash",
+              "id": "wa_hash",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "wa_ticket_ulid",
+              "id": "wa_ticket_ulid",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "masked_client_phone",
+              "id": "masked_client_phone",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            }
+          ],
+          "value": {
+            "last_message": "={{\n{\n\"action\":\"reply\",\n\"replies\": [{\"text\":$('PII Decrypt').first().json.text}],\n\"suggestions\": $('virtual_agent').first().json.suggestions\n}\n}}",
+            "session_id": "={{ $('SalesIQ - Intro').first().json.body.visitor.uvid }}",
+            "updated_at": "={{ $now }}"
+          }
+        },
+        "operation": "update",
+        "options": {},
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "cachedResultName": "visitors_settings",
+          "mode": "list",
+          "value": "visitors_settings"
+        }
+      },
+      "position": [
+        6096,
+        992
+      ],
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6
+    },
+    {
+      "id": "7a3e0591-1117-4513-ab77-dfa3446df962",
+      "name": "Post message",
+      "parameters": {
+        "body": "={{\n{\n\"action\":\"reply\",\n\"replies\": [{\"text\":$('PII Decrypt').first().json.text}],\n\"suggestions\": $('virtual_agent').first().json.suggestions\n}\n}}",
+        "contentType": "raw",
+        "method": "POST",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        },
+        "rawContentType": "application/json",
+        "sendBody": true,
+        "url": "={{ $('VARs').first().json.VAR_SALESIQ_API_V2_URL }}/callbacks/{{ $('SalesIQ - Intro').first().json.body.request.id }}/response"
+      },
+      "position": [
+        6096,
+        800
+      ],
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2
+    },
+    {
+      "id": "7bf14552-6481-42a6-97cf-8746d51b2f00",
+      "name": "Attachments",
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "31a325e1-182a-47db-a2a3-e8b2428b4582",
+              "name": "attachments",
+              "type": "array",
+              "value": "={{ $('SalesIQ - Intro').item.json.body.attachments }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "position": [
+        1232,
+        1456
+      ],
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4
+    },
+    {
+      "credentials": {
+        "openAiApi": {
+          "id": "llAQampncp8P5l8I",
+          "name": "Input guardrail"
+        }
+      },
+      "id": "a24e610d-99c6-4854-97a6-c9ac15b863e7",
+      "name": "Analyze image",
+      "parameters": {
+        "imageUrls": "={{ $('Split attachments').item.json.url }}",
+        "modelId": {
+          "__rl": true,
+          "cachedResultName": "GPT-4O",
+          "mode": "list",
+          "value": "gpt-4o"
+        },
+        "operation": "analyze",
+        "options": {},
+        "resource": "image",
+        "text": "Describe this image in detail. If it shows a travel document (boarding pass, e-ticket, passport, ID, booking confirmation, receipt) or a screenshot of an app, website, or error message, transcribe any visible text (names, booking codes, dates, prices, error messages, fields). Otherwise describe what is visible in the image."
+      },
+      "position": [
+        1792,
+        1456
+      ],
+      "retryOnFail": true,
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1
+    },
+    {
+      "id": "ebd103ce-d279-4d8b-bffa-045f9ffc1f3d",
+      "name": "Mime type",
+      "parameters": {
+        "options": {
+          "fallbackOutput": "extra"
+        },
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "348b5106-fef7-4fd8-b1fb-d066d5dae877",
+                    "leftValue": "={{ [\"application/pdf\"] }}",
+                    "operator": {
+                      "operation": "contains",
+                      "rightType": "any",
+                      "type": "array"
+                    },
+                    "rightValue": "={{ $('Split attachments').item.json.contenttype }}"
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                }
+              },
+              "outputKey": "document",
+              "renameOutput": true
+            },
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "f56d675e-bf72-41c5-91af-23c989d1b7ad",
+                    "leftValue": "={{ [\"image/png\",\"image/jpg\", \"image/jpeg\", \"image/webp\", \"image/gif\"] }}",
+                    "operator": {
+                      "operation": "contains",
+                      "rightType": "any",
+                      "type": "array"
+                    },
+                    "rightValue": "={{ $('Split attachments').item.json.contenttype }}"
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                }
+              },
+              "outputKey": "image",
+              "renameOutput": true
+            }
+          ]
+        }
+      },
+      "position": [
+        1584,
+        1440
+      ],
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4
+    },
+    {
+      "id": "e6e5b2fb-b3bf-4d53-a531-735a87af850a",
+      "name": "Split attachments",
+      "parameters": {
+        "fieldToSplitOut": "attachments",
+        "options": {}
+      },
+      "position": [
+        1408,
+        1456
+      ],
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1
+    },
+    {
+      "id": "83f853f7-a817-492b-8b6b-c26f196710ec",
+      "name": "Not supported",
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "99dab8dd-f5ce-4fbc-891f-bb21bcb3d955",
+              "name": "text",
+              "type": "string",
+              "value": "={{ (() => {\n  const caption = ($('SalesIQ - Intro').first().json.body.message?.meta?.comments?.[$('Split attachments').item.json.id] || '').toString().trim();\n  const PREFIX = 'Here is my attachment description: ';\n  const marker = '[File type not supported]';\n  return caption ? (caption + '\\n' + PREFIX + marker) : (PREFIX + marker);\n})() }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "position": [
+        1984,
+        1616
+      ],
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4
+    },
+    {
+      "id": "ff9bfdb7-a262-4c6b-ad98-fb8acafdcc76",
+      "name": "Extract from File",
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "position": [
+        1984,
+        1296
+      ],
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1
+    },
+    {
+      "id": "e119fe16-4f4b-445b-a0e3-7fc47ef3b277",
+      "name": "Get file",
+      "parameters": {
+        "options": {},
+        "url": "={{ $json.url }}"
+      },
+      "position": [
+        1792,
+        1296
+      ],
+      "retryOnFail": true,
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3
+    },
+    {
+      "id": "9caf63bd-139a-4f3a-9c8b-c69d3f69c072",
+      "name": "Switch",
+      "parameters": {
+        "options": {
+          "fallbackOutput": "extra"
+        },
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "e894d786-f130-4e54-b908-4bdf42f22aa4",
+                    "leftValue": "={{ $('SalesIQ - Intro').item.json.body.message.type }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "=text"
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                }
+              },
+              "outputKey": "Text",
+              "renameOutput": true
+            },
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "630e58bc-4f88-4dcb-8b8e-60269e3424fd",
+                    "leftValue": "={{ $('SalesIQ - Intro').item.json.body.message.type }}",
+                    "operator": {
+                      "name": "filter.operator.equals",
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "=files"
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                }
+              },
+              "outputKey": "Attachment",
+              "renameOutput": true
+            }
+          ]
+        }
+      },
+      "position": [
+        944,
+        592
+      ],
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4
+    },
+    {
+      "id": "64739091-683e-4c08-9ace-7315f7512d61",
+      "name": "Merge attachment branches",
+      "parameters": {
+        "numberInputs": 3
+      },
+      "position": [
+        2432,
+        1440
+      ],
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2
+    },
+    {
+      "id": "60bff2f1-178a-4cd2-91be-5e7b1d797b4a",
+      "name": "Sticky Note3",
+      "parameters": {
+        "content": "## Attachments Processing\n",
+        "height": 512,
+        "width": 1456
+      },
+      "position": [
+        1168,
+        1264
+      ],
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1
+    },
+    {
+      "id": "69878bb5-3d2b-42bf-af05-43fb802d9d6a",
+      "name": "Sticky Note5",
+      "parameters": {
+        "content": "## Handlers\n",
+        "height": 1120,
+        "width": 2352
+      },
+      "position": [
+        1168,
+        112
+      ],
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1
+    },
+    {
+      "id": "3144e04a-63b1-4b56-b50d-317ed57e1513",
+      "name": "Return empty",
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3d3cbd01-4f45-469c-b868-60ff8be4db75",
+              "name": "text",
+              "type": "string",
+              "value": "={{ (() => {\n  const caption = ($('SalesIQ - Intro').first().json.body.message?.meta?.comments?.[$('Split attachments').item.json.id] || '').toString().trim();\n  const pdfText = ($('Extract from File').item.json?.text || '').toString().trim();\n  const PREFIX = 'Here is my attachment description: ';\n  if (caption && pdfText) return caption + '\\n' + PREFIX + pdfText;\n  return pdfText ? PREFIX + pdfText : caption;\n})() }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "position": [
+        2176,
+        1296
+      ],
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4
+    },
+    {
+      "id": "37875b60-c072-480a-b9f9-bf02259c46b0",
+      "name": "Return Caption",
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "98e55677-2661-455b-9bab-aef96b34f3a1",
+              "name": "text",
+              "type": "string",
+              "value": "={{ (() => {\n  const caption = ($('SalesIQ - Intro').first().json.body.message?.meta?.comments?.[$('Split attachments').item.json.id] || '').toString().trim();\n  const aiOut = $('Analyze image').item.json;\n  let description = '';\n  if (typeof aiOut?.content === 'string') {\n    description = aiOut.content;\n  } else if (Array.isArray(aiOut) && aiOut[0]?.content?.[0]?.text) {\n    description = aiOut[0].content[0].text;\n  } else if (typeof aiOut?.output_text === 'string') {\n    description = aiOut.output_text;\n  } else if (Array.isArray(aiOut?.output) && aiOut.output[0]?.content?.[0]?.text) {\n    description = aiOut.output[0].content[0].text;\n  }\n  description = (description || '').toString().trim();\n  const PREFIX = 'Here is my attachment description: ';\n  if (caption && description) return caption + '\\n' + PREFIX + description;\n  return description ? PREFIX + description : (caption || 'See image description');\n})() }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "position": [
+        2176,
+        1456
+      ],
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4
+    },
+    {
+      "id": "dca1a090-3a83-442d-b452-dc1d7ac4b544",
+      "name": "visitor_exists",
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "bd625efe-6632-4e7d-97d4-2e6f4a76dab4",
+              "leftValue": "={{ $('Get settings').first().json.id }}",
+              "operator": {
+                "operation": "exists",
+                "singleValue": true,
+                "type": "string"
+              },
+              "rightValue": ""
+            }
+          ],
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          }
+        },
+        "options": {}
+      },
+      "position": [
+        400,
+        624
+      ],
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3
+    },
+    {
+      "credentials": {
+        "postgres": {
+          "id": "hXZkgfuWSJSTX4OT",
+          "name": "Postgres"
+        }
+      },
+      "id": "1a521153-7c51-4379-a07c-d12d70ab544f",
+      "name": "Create record",
+      "parameters": {
+        "columns": {
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false,
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": true,
+              "display": true,
+              "displayName": "id",
+              "id": "id",
+              "removed": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "session_id",
+              "id": "session_id",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "created_at",
+              "id": "created_at",
+              "removed": true,
+              "required": false,
+              "type": "dateTime"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "updated_at",
+              "id": "updated_at",
+              "removed": true,
+              "required": false,
+              "type": "dateTime"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "chatinfo_data",
+              "id": "chatinfo_data",
+              "removed": true,
+              "required": false,
+              "type": "object"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "checkout_data",
+              "id": "checkout_data",
+              "removed": true,
+              "required": false,
+              "type": "object"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "project",
+              "id": "project",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "validation",
+              "id": "validation",
+              "removed": false,
+              "required": false,
+              "type": "boolean"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "lead_id",
+              "id": "lead_id",
+              "removed": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "last_message",
+              "id": "last_message",
+              "removed": true,
+              "required": false,
+              "type": "object"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "type",
+              "id": "type",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "contactUs_url",
+              "id": "contactUs_url",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "language",
+              "id": "language",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "booking_identifier",
+              "id": "booking_identifier",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "case_id",
+              "id": "case_id",
+              "removed": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "selected_quote_key",
+              "id": "selected_quote_key",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "last_message_full",
+              "id": "last_message_full",
+              "removed": true,
+              "required": false,
+              "type": "object"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "more_option_iteration",
+              "id": "more_option_iteration",
+              "removed": true,
+              "required": false,
+              "type": "number"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "is_whatsapp",
+              "id": "is_whatsapp",
+              "removed": false,
+              "required": false,
+              "type": "boolean"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "last_conversation_id",
+              "id": "last_conversation_id",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "wa_hash",
+              "id": "wa_hash",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "wa_ticket_ulid",
+              "id": "wa_ticket_ulid",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "masked_client_phone",
+              "id": "masked_client_phone",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "last_template_sent_at",
+              "id": "last_template_sent_at",
+              "removed": true,
+              "required": false,
+              "type": "dateTime"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "validated_orders",
+              "id": "validated_orders",
+              "removed": true,
+              "required": false,
+              "type": "array"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "request_id",
+              "id": "request_id",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "conversation_id",
+              "id": "conversation_id",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "order_tickets",
+              "id": "order_tickets",
+              "removed": true,
+              "required": false,
+              "type": "object"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "request_type",
+              "id": "request_type",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "journey_stage",
+              "id": "journey_stage",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "va_state",
+              "id": "va_state",
+              "removed": true,
+              "required": false,
+              "type": "object"
+            }
+          ],
+          "value": {
+            "contactUs_url": "={{ $('Get Project - first').first().json.contactUs_url }}",
+            "conversation_id": "={{ $('SalesIQ - Intro').first().json.body.visitor?.active_conversation_id || null }}",
+            "is_whatsapp": "={{ $('SalesIQ - Intro').first().json.body.visitor.custom_info.platform === \"whatsapp\" ? true : false }}",
+            "language": "={{ $('SalesIQ - Intro').first().json.body.visitor.language }}",
+            "project": "={{ $('Get Project - first').first().json.project_key }}",
+            "request_id": "={{ $('SalesIQ - Intro').first().json.body.request.id }}",
+            "session_id": "={{ $('SalesIQ - Intro').first().json.body.visitor.uvid }}",
+            "type": "general",
+            "validation": false
+          }
+        },
+        "options": {},
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "cachedResultName": "visitors_settings",
+          "mode": "list",
+          "value": "visitors_settings"
+        }
+      },
+      "position": [
+        768,
+        672
+      ],
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6
+    },
+    {
+      "id": "237f5c3f-c273-4abb-8f3c-7e364834c4ca",
+      "name": "context_compression",
+      "parameters": {
+        "options": {
+          "waitForSubWorkflow": false
+        },
+        "workflowId": {
+          "__rl": true,
+          "cachedResultName": "va/context/summarize",
+          "cachedResultUrl": "/workflow/SXzgRWuPnvVn9dHv",
+          "mode": "list",
+          "value": "SXzgRWuPnvVn9dHv"
+        },
+        "workflowInputs": {
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true,
+          "mappingMode": "defineBelow",
+          "matchingColumns": [],
+          "schema": [
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "client_id",
+              "id": "client_id",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "chat_memory_table",
+              "id": "chat_memory_table",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "session_id",
+              "id": "session_id",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            }
+          ],
+          "value": {
+            "chat_memory_table": "chat_messages",
+            "session_id": "={{ $('SalesIQ - Intro').first().json.body.visitor.uvid }}"
+          }
+        }
+      },
+      "position": [
+        4272,
+        720
+      ],
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3
+    },
+    {
+      "id": "b2166ef3-cb89-4ba9-afc5-2ce770d44df4",
+      "name": "New conversation",
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "d81aec59-905e-4e20-a63c-b25d84198670",
+              "leftValue": "={{ $('Get settings').first().json.id }}",
+              "operator": {
+                "operation": "exists",
+                "singleValue": true,
+                "type": "string"
+              },
+              "rightValue": 0
+            }
+          ],
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          }
+        },
+        "options": {}
+      },
+      "position": [
+        3616,
+        704
+      ],
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3
+    },
+    {
+      "id": "803513cd-8ee0-401b-9d0e-1b7b6eba3cfa",
+      "name": "Save event to Click-House Chat Started",
+      "parameters": {
+        "options": {},
+        "workflowId": {
+          "__rl": true,
+          "cachedResultName": "Save event to Click-House",
+          "cachedResultUrl": "/workflow/DjSkNEWzR4gyM-wUTyJSN",
+          "mode": "list",
+          "value": "DjSkNEWzR4gyM-wUTyJSN"
+        },
+        "workflowInputs": {
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false,
+          "mappingMode": "defineBelow",
+          "matchingColumns": [],
+          "schema": [
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "meta.schemaVersion",
+              "id": "meta.schemaVersion",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "meta.time",
+              "id": "meta.time",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "meta.id",
+              "id": "meta.id",
+              "removed": true,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "meta.type",
+              "id": "meta.type",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "meta.typeSchemaVersion",
+              "id": "meta.typeSchemaVersion",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "meta.producer.id",
+              "id": "meta.producer.id",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "meta.application.id",
+              "id": "meta.application.id",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "meta.application.instance",
+              "id": "meta.application.instance",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "meta.application.env",
+              "id": "meta.application.env",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "data",
+              "id": "data",
+              "removed": false,
+              "required": false,
+              "type": "object"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "execution",
+              "id": "execution",
+              "removed": false,
+              "required": false,
+              "type": "object"
+            }
+          ],
+          "value": {
+            "data": "={{ \n{\n    \"project\": $('Update request_id').first().json.project,\n    \"platform\": \"salesiq\",\n    \"clients_table\": \"visitors_settings\",\n    \"client_id\": $('Update request_id').first().json.id,\n    \"chat_memory_table\": \"chat_messages\",\n    \"session_id\": $('SalesIQ - Intro').first().json.body.visitor.uvid,\n    \"conversation_id\": $('SalesIQ - Intro').item.json.body.visitor.active_conversation_id,\n    \"request_category\": $('Update request_id').first().json.request_type,\n    \"identity_check_passed\": $('Update request_id').first().json.validation,\n    \"success\": true\n  }\n}}",
+            "execution": "={{ \n    {\n      \"workflow_id\": $workflow.id,\n      \"execution_id\": $execution.id,\n      \"workflow_name\": $workflow.name,\n      \"mode\": $execution.mode\n    }\n}}",
+            "meta.application.env": "={{ $('VARs').first().json.VAR_ENV }}",
+            "meta.application.id": "n8n",
+            "meta.application.instance": "=882108c5edd95f9ba914c9588997017c62bfce83c80922bd8ad4223698e3d9f3",
+            "meta.producer.id": "virtual_agent",
+            "meta.schemaVersion": "1.0.0",
+            "meta.time": "={{ $now.toUTC() }}",
+            "meta.type": "va/inputProcessing/conversation/started",
+            "meta.typeSchemaVersion": "1.0.0"
+          }
+        }
+      },
+      "position": [
+        3824,
+        592
+      ],
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2
+    },
+    {
+      "credentials": {
+        "postgres": {
+          "id": "hXZkgfuWSJSTX4OT",
+          "name": "Postgres"
+        }
+      },
+      "id": "7f928e4d-0e9c-4a0c-b6e4-dd34ef56d135",
+      "name": "Consume opener",
+      "parameters": {
+        "operation": "executeQuery",
+        "options": {
+          "queryReplacement": "={{ $('SalesIQ - Intro').first().json.body.visitor.uvid }}"
+        },
+        "query": "WITH opener AS (\n  SELECT\n    va_state->'last_opener'->>'text' AS text,\n    COALESCE(\n      (va_state->'last_opener'->>'sent_at')::timestamptz,\n      NOW()\n    ) AS sent_at\n  FROM visitors_settings\n  WHERE session_id = $1\n    AND va_state ? 'last_opener'\n    AND va_state->'last_opener' IS NOT NULL\n),\ninserted AS (\n  INSERT INTO chat_messages (session_id, message, created_at)\n  SELECT\n    $1,\n    jsonb_build_object(\n      'type', 'ai',\n      'content', text,\n      'additional_kwargs', '{}'::jsonb,\n      'response_metadata', '{}'::jsonb,\n      'tool_calls', '[]'::jsonb,\n      'invalid_tool_calls', '[]'::jsonb\n    ),\n    sent_at\n  FROM opener\n  RETURNING id\n),\ncleared AS (\n  UPDATE visitors_settings\n  SET va_state = va_state - 'last_opener'\n  WHERE session_id = $1\n    AND va_state ? 'last_opener'\n  RETURNING id\n)\nSELECT\n  COALESCE((SELECT COUNT(*) FROM inserted), 0) AS opener_inserted,\n  COALESCE((SELECT COUNT(*) FROM cleared), 0) AS opener_cleared;"
+      },
+      "position": [
+        4032,
+        592
+      ],
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6
+    },
+    {
+      "id": "7b6ef386-e36c-47fd-ac92-a8fad734b049",
+      "name": "virtual_agent",
+      "onError": "continueErrorOutput",
+      "parameters": {
+        "options": {},
+        "workflowId": {
+          "__rl": true,
+          "cachedResultName": "hub 178 - va/virtualAgent/message",
+          "cachedResultUrl": "/workflow/zkxwMnqo40qiRY3a",
+          "mode": "list",
+          "value": "zkxwMnqo40qiRY3a"
+        },
+        "workflowInputs": {
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true,
+          "mappingMode": "defineBelow",
+          "matchingColumns": [],
+          "schema": [
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "project",
+              "id": "project",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "clients_table",
+              "id": "clients_table",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "client_id",
+              "id": "client_id",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "chat_memory_table",
+              "id": "chat_memory_table",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "session_id",
+              "id": "session_id",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "sanitized_text",
+              "id": "sanitized_text",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "platform",
+              "id": "platform",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "canBeUsedToMatch": true,
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "entry_point",
+              "id": "entry_point",
+              "removed": false,
+              "required": false,
+              "type": "string"
+            }
+          ],
+          "value": {
+            "chat_memory_table": "chat_messages",
+            "client_id": "={{ \n$('Get settings').first().json.id ??\n$('Create record').first().json.id \n}}",
+            "clients_table": "visitors_settings",
+            "entry_point": "={{ $('entry_point').first().json.entry_point }}",
+            "platform": "salesiq",
+            "project": "={{ $('Get settings').first().json.project || $('Create record').first().json.project }}",
+            "sanitized_text": "={{\n$('Merge attachment branches').isExecuted ?\n  ($('Merge attachment branches').first().json.text || '') :\n    $('SalesIQ - Intro').first().json.body.message.text || ''\n}}",
+            "session_id": "={{ $('SalesIQ - Intro').first().json.body.visitor.uvid }}"
+          }
+        }
+      },
+      "position": [
+        4912,
+        720
+      ],
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3
+    },
+    {
+      "credentials": {
+        "postgres": {
+          "id": "hXZkgfuWSJSTX4OT",
+          "name": "Postgres"
+        }
+      },
+      "id": "740e7658-2f56-408a-8ac3-4f57472c7a59",
+      "name": "PII Encrypt",
+      "parameters": {
+        "is_phone": true,
+        "table_name": "pii_data",
+        "text": "={{\n$('Merge attachment branches').isExecuted ?\n  ($('Merge attachment branches').first().json.text || '') :\n    $('SalesIQ - Intro').first().json.body.message.text || ''\n}}",
+        "unique_id": "={{ $('SalesIQ - Intro').first().json.body.visitor.uvid }}"
+      },
+      "position": [
+        4704,
+        720
+      ],
+      "type": "CUSTOM.PiiEncryptNode",
+      "typeVersion": 1
+    },
+    {
+      "id": "49cc0144-8249-4ea1-b758-0121b5066c6a",
+      "name": "entry_point",
+      "parameters": {
+        "jsCode": "const u = String($('SalesIQ - Intro').first().json?.body?.visitor?.landing_page_url ?? '');\nlet entry_point = 'default';\nif (/\\/checkout/i.test(u)) entry_point = 'checkout';\nelse if (/[?&]utm_source=(google|bing)\\b/i.test(u)) entry_point = 'paid_search';\nelse if (/^https?:\\/\\/[^/]+\\/?([a-z]{2}(-[a-z]{2})?\\/?)?(\\?|#|$)/i.test(u)) entry_point = 'home';\nreturn [{ json: { entry_point } }];"
+      },
+      "position": [
+        4480,
+        720
+      ],
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2
+    }
+  ],
+  "parentFolderId": "tyt3spqbcfp5XWik",
+  "pinData": {
+    "SalesIQ - Intro": [
+      {
+        "binary": {
+          "data": {
+            "data": "eyJoYW5kbGVyIjoibWVzc2FnZSIsInJlcXVlc3QiOnsib3MiOiJNaWNyb3NvZnQgV2luZG93cyIsImJyb3dzZXIiOiJHb29nbGUgQ2hyb21lIiwiaXAiOiIyMTcuMjYuMTYyLjIyIiwibG9jYXRpb24iOnsiY291bnRyeSI6Ik1vbGRvdmEiLCJjaXR5IjoiQ2hpc2luYXUgIiwic3RhdGUiOiJDaGlzaW5hdSAiLCJsb25nIjoiMjguODQiLCJsYXQiOiI0Ny4wMyJ9LCJpZCI6IjdmN2FhOGJmYjM2ZWY2NzBkYjZiODFmMGQxOWYxOTUyZGVjNTY3NWNlOWM2MTE3ZTFiYzMzYzBjNWEwODEyOGZkYjE0M2Q3ZmEyMDg2MTM4MGVlZjlkMjY5Nzk5OGZlN2RjNDYwZTVlOTFlMjg0MjFlYTdkYjAzMGM0ZWIyYWJjIiwiYXBwX2lkIjoiNDgyMzMwMDAwMDQzNjQ0MDEifSwiYXR0YWNobWVudHMiOltdLCJvcmdfaWQiOiI2MDAxMTE0ODQyMiIsIm1lc3NhZ2UiOnsibWV0YSI6eyJjYXJkX2RhdGEiOnsiaWQiOiJ6eHZwbDRmdDk5IiwidHlwZSI6InN1Z2dlc3Rpb25zIiwidmFsdWUiOiJZZXMifSwidmVyc2lvbiI6IjEifSwidGV4dCI6IlllcyIsInR5cGUiOiJ0ZXh0In0sInZpc2l0b3IiOnsicmVmZXJlciI6Imh0dHBzOi8vb3ZhZ28uaHlicmlkLnN0YWdlLnRyYXZlbC1kZXYuY29tL2VuLXVzL2ZsaWdodHMvcmVzdWx0cy9STU8tQktLLzIwMjYtMDgtMDIvMjAyNi0wOC0xNi8/YWR0PTEmY2FiaW49RSZjaGQ9MCZpbmY9MCZpdGluZXJhcnk9MF9UMDVHUWxZeUtsa3hNREF3TDFKTlQwSkxTekl3TWpZdE1EZ3RNREpmTVRZeU15OUNTMHRTVFU4eU1ESTJMVEE0TFRFMlh6SXpNVElxVDFOJTJCSTA5VE56RTRJMDlUTnlOUFV6Z2pUMU0zTVRkJTJCYkdNNlpXNWZkWE0lM0QiLCJjb3VudHJ5IjoiTW9sZG92YSIsImNpdHkiOiJDaGlzaW5hdSAiLCJsYW5kaW5nX3BhZ2VfdGl0bGUiOiJDaGVhcCBpbnRlcm5hdGlvbmFsIGZsaWdodHMgfCBDaGVjayBhaXJmYXJlIHByaWNlcyBvbmxpbmUgLSBPVkFHTyIsInZpc2l0b3JfaWQiOiI0ODIzMzAwMDAyNDQwNjA3NiIsImNoYW5uZWwiOiJ3ZWJzaXRlIiwidXZpZCI6IjEzZWMwODRhLTI0YTMtNDVmMC1hYzQyLTY2NTNlYjlhMmM3Ni0xIiwibGFuZ3VhZ2UiOiJlbiIsInV1aWQiOiJlNTEzMzU0ZS05MDBlLTRiZTktYWM4MS04NTNhMzI4NDYwMDVfYTE0MSIsImxvbmciOiIyOC44NCIsImN1cnJlbnRfcGFnZV91cmwiOiJodHRwczovL292YWdvLmh5YnJpZC5zdGFnZS50cmF2ZWwtZGV2LmNvbS9lbi11cy9jaGVja291dC9PQzM1Rjk1QkMiLCJudW1iZXJfb2ZfcGFzdF92aXNpdHMiOiIwIiwiYnJvd3NlciI6Ikdvb2dsZSBDaHJvbWUiLCJzdGF0ZSI6IkNoaXNpbmF1ICIsImxhbmRpbmdfcGFnZV91cmwiOiJodHRwczovL292YWdvLmh5YnJpZC5zdGFnZS50cmF2ZWwtZGV2LmNvbS9lbi11cy9jaGVja291dC9PQzM1Rjk1QkMiLCJmaXJzdF9uYW1lIjoiIiwibGF0IjoiNDcuMDMiLCJvcyI6Ik1pY3Jvc29mdCBXaW5kb3dzIiwicXVlc3Rpb24iOiJZZXMiLCJkZXBhcnRtZW50X2lkIjoiNDgyMzMwMDAwMDQzNTk5OTkiLCJpcCI6IjIxNy4yNi4xNjIuMjIiLCJsYXN0X25hbWUiOiJWaXNpdG9yIDcxMzQ4MSIsInRpbWVfem9uZSI6IkdNVCswMzAwIChFYXN0ZXJuIEV1cm9wZWFuIFN1bW1lciBUaW1lKSIsImFjdGl2ZV9jb252ZXJzYXRpb25faWQiOiI0ODIzMzAwMDAyNDQwNjA3NiIsImNvdW50cnlfY29kZSI6Ik1EIiwiaW5fdGltZSI6MTc4MDU3OTEwOTQ2NCwibGVhZF9zY29yZSI6IjIiLCJ2aXNpdGlkIjo1MzcxNzcsImN1c3RvbV9pbmZvIjp7InByb2plY3QiOiJvdmFnbyIsInV0X3Zpc2l0b3JfaWQiOiIyMGIzODAwYy02MDlhLTQ1NjUtYWZiYi0wMDZkZDIyNzcxYjAifSwibmFtZSI6IlZpc2l0b3IgNzEzNDgxIiwicHJldmlvdXNfcGFnZV91cmwiOiJodHRwczovL292YWdvLmh5YnJpZC5zdGFnZS50cmF2ZWwtZGV2LmNvbS9lbi11cy9mbGlnaHRzL3Jlc3VsdHMvUk1PLUJLSy8yMDI2LTA4LTAyLzIwMjYtMDgtMTYvP2FkdD0xJmNhYmluPUUmY2hkPTAmaW5mPTAmaXRpbmVyYXJ5PTBfVDA1R1FsWXlLbGt4TURBd0wxSk5UMEpMU3pJd01qWXRNRGd0TURKZk1UWXlNeTlDUzB0U1RVOHlNREkyTFRBNExURTJYekl6TVRJcVQxTiUyQkkwOVROekU0STA5VE55TlBVemdqVDFNM01UZCUyQmJHTTZaVzVmZFhNJTNEIiwibnVtYmVyX29mX3Bhc3RfY2hhdHMiOiIwIiwiY3VycmVudF9wYWdlX3RpdGxlIjoiQ2hlYXAgaW50ZXJuYXRpb25hbCBmbGlnaHRzIHwgQ2hlY2sgYWlyZmFyZSBwcmljZXMgb25saW5lIC0gT1ZBR08ifSwib3BlcmF0aW9uIjoiY2hhdCJ9",
+            "mimeType": "application/json"
+          }
+        },
+        "json": {
+          "body": {
+            "attachments": [],
+            "handler": "message",
+            "message": {
+              "meta": {
+                "card_data": {
+                  "id": "zxvpl4ft99",
+                  "type": "suggestions",
+                  "value": "Yes"
+                },
+                "version": "1"
+              },
+              "text": "Yes",
+              "type": "text"
+            },
+            "operation": "chat",
+            "org_id": "60011148422",
+            "request": {
+              "app_id": "48233000004364401",
+              "browser": "Google Chrome",
+              "id": "7f7aa8bfb36ef670db6b81f0d19f1952dec5675ce9c6117e1bc33c0c5a08128fdb143d7fa20861380eef9d2697998fe7dc460e5e91e28421ea7db030c4eb2abc",
+              "ip": "217.26.162.22",
+              "location": {
+                "city": "Chisinau ",
+                "country": "Moldova",
+                "lat": "47.03",
+                "long": "28.84",
+                "state": "Chisinau "
+              },
+              "os": "Microsoft Windows"
+            },
+            "visitor": {
+              "active_conversation_id": "48233000024406076",
+              "browser": "Google Chrome",
+              "channel": "website",
+              "city": "Chisinau ",
+              "country": "Moldova",
+              "country_code": "MD",
+              "current_page_title": "Cheap international flights | Check airfare prices online - OVAGO",
+              "current_page_url": "https://ovago.hybrid.stage.travel-dev.com/en-us/checkout/OC35F95BC",
+              "custom_info": {
+                "project": "ovago",
+                "ut_visitor_id": "20b3800c-609a-4565-afbb-006dd22771b0"
+              },
+              "department_id": "48233000004359999",
+              "first_name": "",
+              "in_time": 1780579109464,
+              "ip": "217.26.162.22",
+              "landing_page_title": "Cheap international flights | Check airfare prices online - OVAGO",
+              "landing_page_url": "https://ovago.hybrid.stage.travel-dev.com/en-us/checkout/OC35F95BC",
+              "language": "en",
+              "last_name": "Visitor 713481",
+              "lat": "47.03",
+              "lead_score": "2",
+              "long": "28.84",
+              "name": "Visitor 713481",
+              "number_of_past_chats": "0",
+              "number_of_past_visits": "0",
+              "os": "Microsoft Windows",
+              "previous_page_url": "https://ovago.hybrid.stage.travel-dev.com/en-us/flights/results/RMO-BKK/2026-08-02/2026-08-16/?adt=1&cabin=E&chd=0&inf=0&itinerary=0_T05GQlYyKlkxMDAwL1JNT0JLSzIwMjYtMDgtMDJfMTYyMy9CS0tSTU8yMDI2LTA4LTE2XzIzMTIqT1N%2BI09TNzE4I09TNyNPUzgjT1M3MTd%2BbGM6ZW5fdXM%3D",
+              "question": "Yes",
+              "referer": "https://ovago.hybrid.stage.travel-dev.com/en-us/flights/results/RMO-BKK/2026-08-02/2026-08-16/?adt=1&cabin=E&chd=0&inf=0&itinerary=0_T05GQlYyKlkxMDAwL1JNT0JLSzIwMjYtMDgtMDJfMTYyMy9CS0tSTU8yMDI2LTA4LTE2XzIzMTIqT1N%2BI09TNzE4I09TNyNPUzgjT1M3MTd%2BbGM6ZW5fdXM%3D",
+              "state": "Chisinau ",
+              "time_zone": "GMT+0300 (Eastern European Summer Time)",
+              "uuid": "e513354e-900e-4be9-ac81-853a32846005_a141",
+              "uvid": "13ec084a-24a3-45f0-ac42-6653eb9a2c76-1",
+              "visitid": 537177,
+              "visitor_id": "48233000024406076"
+            }
+          },
+          "executionMode": "production",
+          "headers": {
+            "accept": "application/json",
+            "accept-charset": "UTF-8",
+            "accept-encoding": "gzip",
+            "cache-control": "no-cache",
+            "connection": "keep-alive",
+            "content-length": "2250",
+            "content-type": "application/json",
+            "host": "n8n-agent.dev.travel-dev.com",
+            "pragma": "no-cache",
+            "req-mi-chain": "182209167:8080",
+            "upgrade": "",
+            "user-agent": "Java/17.0.19",
+            "via": "1.1 Caddy",
+            "x-forwarded-for": "103.89.74.49",
+            "x-forwarded-host": "n8n-agent.dev.travel-dev.com",
+            "x-forwarded-proto": "https",
+            "x-real-ip": "103.89.74.49",
+            "x-siqsignature": "GQ1DOCPrUxgurjEZQjRQp7WrK2TFEV3d/XPB4G94tDCVRcMyZtr2GyJY6eRHfY80Vx8pemAs29RD88v+S863knp2Rg6+MVP5JOrVEnYMOa0XDiL3C1EY52ZzXqjNbjO1J9sUzx/juyHVqcppgWQp8YRVCmPMpY+zwODCd7WYONuHMDPfkipQ+iq+scgrtSCG4gzl8hCVRZGAW1SFUNpG5J/O6L7QQ+z6KgMkFvEzaLwg0iVXFWBqYdTcmPmINfOkWwuJY3T3k+N18gYTjfbfP2rAK2/tstFY2bDhYXcK8iSKHzoGu3o82OWZKNsBoie9/8w2ehFxk5pu1xdbIak3cA==",
+            "zsec_user_import_url": "true"
+          },
+          "params": {},
+          "query": {},
+          "webhookUrl": "https://n8n-agent.dev.travel-dev.com/webhook/va-hub178/message/send"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "settings": {
+    "availableInMCP": false,
+    "binaryMode": "separate",
+    "callerPolicy": "any",
+    "errorWorkflow": "zs5YDRv84urjCKo9",
+    "executionOrder": "v1",
+    "timeSavedMode": "fixed"
+  },
+  "staticData": null,
+  "tags": []
+}

@@ -1,0 +1,174 @@
+{
+  "active": true,
+  "connections": {
+    "Get conversation id": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Id exists",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Id exists": {
+      "main": [
+        [],
+        [
+          {
+            "index": 0,
+            "node": "Record conversation id",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Get conversation id",
+            "type": "main"
+          }
+        ]
+      ]
+    }
+  },
+  "description": null,
+  "id": "s2gW479AbNRCX3ap",
+  "name": "Log conversation id",
+  "nodeGroups": [],
+  "nodes": [
+    {
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "vMll0eHd6kbj9lN6",
+          "name": "Supabase"
+        }
+      },
+      "id": "ca67377f-4504-45e2-a153-e1aff9cded93",
+      "name": "Get conversation id",
+      "parameters": {
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "conversation_id",
+              "keyValue": "={{ $('Start').first().json.conversation_id }}"
+            }
+          ]
+        },
+        "operation": "get",
+        "tableId": "conversation_ids"
+      },
+      "position": [
+        200,
+        0
+      ],
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1
+    },
+    {
+      "credentials": {
+        "supabaseApi": {
+          "id": "vMll0eHd6kbj9lN6",
+          "name": "Supabase"
+        }
+      },
+      "id": "1d18ec38-21be-471c-be7a-531d26c572a2",
+      "name": "Record conversation id",
+      "parameters": {
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "session_id",
+              "fieldValue": "={{ $('Start').first().json.sessionId }}"
+            },
+            {
+              "fieldId": "conversation_id",
+              "fieldValue": "={{ $('Start').first().json.conversation_id }}"
+            }
+          ]
+        },
+        "tableId": "conversation_ids"
+      },
+      "position": [
+        620,
+        80
+      ],
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1
+    },
+    {
+      "id": "bc53d446-f53a-4af1-8cff-7b2f972eb628",
+      "name": "Start",
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "conversation_id"
+            },
+            {
+              "name": "sessionId"
+            }
+          ]
+        }
+      },
+      "position": [
+        20,
+        0
+      ],
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1
+    },
+    {
+      "id": "4a7d65bf-d575-4cda-b7ef-6a88104bdb3e",
+      "name": "Id exists",
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "65d647d7-3dcd-49da-8bda-f86c7998e074",
+              "leftValue": "={{ $('Get conversation id').last().json }}",
+              "operator": {
+                "operation": "notEmpty",
+                "singleValue": true,
+                "type": "object"
+              },
+              "rightValue": ""
+            }
+          ],
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          }
+        },
+        "options": {}
+      },
+      "position": [
+        380,
+        0
+      ],
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2
+    }
+  ],
+  "parentFolderId": "2xyqwCQFBfe4VBJ9",
+  "pinData": {},
+  "settings": {
+    "errorWorkflow": "zs5YDRv84urjCKo9",
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "none"
+  },
+  "staticData": null,
+  "tags": [
+    "Async",
+    "Main",
+    "VA"
+  ]
+}
