@@ -9,6 +9,7 @@ import { walkWorkflowJson } from './fsutil';
 import { cmdExport } from './commands/export';
 import { cmdImport } from './commands/import';
 import { cmdProjects } from './commands/projects';
+import { cmdWatch } from './commands/watch';
 
 const VERSION = '2.0.0-alpha.0';
 
@@ -74,6 +75,13 @@ program.command('pull')
 withSharedOptions(program.command('projects'))
   .description("list the target's projects (id|name|type) to pick a --project-id")
   .action(async () => { await cmdProjects(); });
+
+withSharedOptions(program.command('watch'))
+  .description('poll the instance and export on change — independent real-time mirror (local sidecar)')
+  .option('--interval <seconds>', 'poll interval in seconds', '3')
+  .action(async (opts: { interval?: string }, cmd: Command) => {
+    await cmdWatch(resolveConfig(cmd), Math.max(1, Number(opts.interval ?? 3)) * 1000);
+  });
 
 program.parseAsync(process.argv).catch((err: unknown) => {
   process.stderr.write(`${err instanceof Error ? err.message : String(err)}\n`);
