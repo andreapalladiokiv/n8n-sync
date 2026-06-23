@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { Command } from 'commander';
 import { serializeWorkflow } from './normalize';
 import { resolveConfig } from './config';
@@ -55,6 +56,13 @@ withSharedOptions(program.command('export'))
 withSharedOptions(program.command('import'))
   .description('repo -> n8n: id-preserving import, folders, credential-aware + cycle-safe activation')
   .action(async (_opts: unknown, cmd: Command) => { process.exitCode = await cmdImport(resolveConfig(cmd)); });
+
+program.command('hook-path')
+  .description('print the path to the bundled n8n external hook (for EXTERNAL_HOOK_FILES)')
+  .action(() => {
+    const dir = path.dirname(fileURLToPath(import.meta.url));
+    process.stdout.write(`${path.join(dir, 'hook.cjs')}\n`);
+  });
 
 program.command('pull')
   .description('(host orchestration) export -> git pull -> import — run via `make pull`, not in-container')

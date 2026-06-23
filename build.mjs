@@ -1,5 +1,5 @@
 import { build } from 'esbuild';
-import { chmodSync } from 'node:fs';
+import { chmodSync, copyFileSync } from 'node:fs';
 
 const OUT = 'dist/n8n-sync.mjs';
 
@@ -26,4 +26,9 @@ await build({
 });
 
 chmodSync(OUT, 0o755);
-console.error(`built ${OUT}`);
+
+// Ship the n8n external hook (plain CJS — n8n loads hook files via require()) next
+// to the bundle, so it can resolve the sibling CLI at runtime. Copied verbatim.
+copyFileSync('src/hook.cjs', 'dist/hook.cjs');
+
+console.error(`built ${OUT} + dist/hook.cjs`);
