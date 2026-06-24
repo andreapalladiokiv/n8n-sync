@@ -1,0 +1,38 @@
+name: Release to GitHub Packages
+
+# Publish @andreapalladiokiv/n8n-sync to GitHub Packages (npm.pkg.github.com)
+# whenever a v* tag is pushed. Uses the repo's GITHUB_TOKEN — no external creds.
+# The package scope (@andreapalladiokiv) matches the repo owner, which is what
+# GitHub Packages requires; consumers install it with an .npmrc pointing that
+# scope at npm.pkg.github.com + a read:packages token.
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://npm.pkg.github.com
+          scope: '@andreapalladiokiv'
+
+      # `npm ci` runs the `prepare` hook → builds dist/. Build again explicitly so
+      # the publish never races a missing bundle.
+      - run: npm ci
+      - run: npm run build
+
+      # publishConfig in package.json already points at npm.pkg.github.com; the
+      # setup-node step wrote the matching auth line keyed on NODE_AUTH_TOKEN.
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

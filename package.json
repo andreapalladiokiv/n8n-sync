@@ -1,8 +1,15 @@
 {
-  "name": "n8n-sync",
-  "version": "2.0.0-alpha.0",
+  "name": "@andreapalladiokiv/n8n-sync",
+  "version": "1.0.0",
   "description": "CI/CD sync for n8n workflows — TypeScript engine, runs in-container (pg + n8n CLI) and host-side (normalize/validate).",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andreapalladiokiv/n8n-sync.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "bin": {
     "n8n-sync": "dist/n8n-sync.mjs"
   },

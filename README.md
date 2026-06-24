@@ -1,9 +1,10 @@
 # n8n-sync (TypeScript engine)
 
-> **Status: `2.0.0-alpha` — in-progress rewrite** of the bash `n8n-sync` engine.
-> Core commands (`normalize`, `export`, `import`, `projects`) are byte-parity-verified
-> against the bash engine on a live n8n instance. The bash engine (`./n8n-sync`,
-> kept in this repo on `master`) remains the reference until cutover.
+> **Status: `1.0.0`** — the TypeScript engine, published to GitHub Packages as
+> `@andreapalladiokiv/n8n-sync`. Core commands (`normalize`, `export`, `import`,
+> `projects`) are byte-parity-verified against the legacy bash engine on a live n8n
+> instance; `deploy.yml` is verified green end-to-end on a real VM. The bash engine
+> (`./n8n-sync`) is kept in the repo as a reference oracle.
 
 CI/CD sync for [n8n](https://n8n.io) workflows: version-control workflows in git and
 sync them with a running n8n instance, **id-preserving** (via the n8n CLI), with folder
@@ -55,15 +56,28 @@ Precedence: **flag > env > default**.
 
 `--dry-run` plans without mutating.
 
-## Install (bake into the image)
+## Install (GitHub Packages)
 
-The custom n8n image installs the engine from this repo, e.g. in its Dockerfile:
+Published to GitHub Packages as `@andreapalladiokiv/n8n-sync`. Consumers point the
+scope at the GitHub registry in an `.npmrc` and authenticate with a `read:packages`
+token (in CI, a PAT secret or — for same-owner repos — `GITHUB_TOKEN`):
 
-```dockerfile
-RUN npm i -g github:andreapalladiokiv/n8n-sync#ts-rewrite   # builds dist/ via `prepare`
+```ini
+# .npmrc
+@andreapalladiokiv:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
 ```
 
-Then on the host / in CI: `docker exec <container> n8n-sync import`.
+```sh
+npm install @andreapalladiokiv/n8n-sync          # or pin @1.0.0
+```
+
+The single bin `n8n-sync` (→ `dist/n8n-sync.mjs`) is then on `PATH`/`npx`. To run the
+in-container commands, copy the bundle into the n8n container and exec it there:
+`docker exec <container> node /path/n8n-sync.mjs import` (or `n8n-sync import` once
+baked into the image). `normalize` is pure and runs host-side directly.
+
+Releases publish automatically: pushing a `v*` tag triggers `.github/workflows/release.yml`.
 
 ## Develop
 
