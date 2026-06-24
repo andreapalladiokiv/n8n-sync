@@ -19,7 +19,7 @@ async function readSignature(cfg: Config): Promise<string> {
   const db = await Db.open();
   try {
     const rows = await db.rows<{ id: string; updatedAt: string }>(
-      'SELECT id, "updatedAt"::text AS "updatedAt" FROM workflow_entity',
+      'SELECT id, CAST("updatedAt" AS text) AS "updatedAt" FROM workflow_entity',
     );
     return workflowSignature(rows, scope);
   } finally {

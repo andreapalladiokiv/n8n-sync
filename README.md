@@ -1,10 +1,9 @@
 # n8n-sync (TypeScript engine)
 
-> **Status: `1.0.0`** — the TypeScript engine, published to GitHub Packages as
-> `@andreapalladiokiv/n8n-sync`. Core commands (`normalize`, `export`, `import`,
-> `projects`) are byte-parity-verified against the legacy bash engine on a live n8n
-> instance; `deploy.yml` is verified green end-to-end on a real VM. The bash engine
-> (`./n8n-sync`) is kept in the repo as a reference oracle.
+> **Status: `1.1.0`** — the TypeScript engine, published to GitHub Packages as
+> `@andreapalladiokiv/n8n-sync`. **DB-agnostic**: works against both Postgres- and
+> SQLite-backed n8n (since 1.1.0). Verified end-to-end on both — a full import + export
+> round-trip on SQLite, and `deploy.yml` green on a real Postgres VM.
 
 CI/CD sync for [n8n](https://n8n.io) workflows: version-control workflows in git and
 sync them with a running n8n instance, **id-preserving** (via the n8n CLI), with folder
@@ -16,14 +15,16 @@ Unlike the bash engine (which ran on the host and shelled in over `docker exec`)
 engine is **baked into the n8n image and runs in-container**, where everything it needs
 already lives:
 
-- **Database** — a native `pg.Client` over n8n's own `DB_POSTGRESDB_*` env (parameterized
-  queries; the whole DB mutation runs in one transaction).
+- **Database** — a hand-built `@n8n/typeorm` `DataSource` from n8n's own DB env,
+  **DB-agnostic** (Postgres + SQLite, chosen by `DB_TYPE`; no n8n DI). Parameterized
+  queries; the whole DB mutation runs in one transaction.
 - **Workflows** — the `n8n` CLI (`export/import:workflow`) via `child_process`, so entity
   ids stay stable (the REST API cannot create-with-id).
 - **Activation** — the n8n REST API on `localhost` (`fetch`), so triggers register live.
 
-`pg` is **not bundled** — it is resolved at runtime from n8n's `node_modules`. Everything
-else (incl. the CLI lib) bundles into a single `dist/n8n-sync.mjs`.
+`@n8n/typeorm` and the DB driver (pg / sqlite) are **not bundled** — they are resolved at
+runtime from n8n's own `node_modules`. Everything else (incl. the CLI lib) bundles into a
+single `dist/n8n-sync.mjs`.
 
 The host side (a Makefile / CI) is thin: put the repo workflows where the container can
 read them, then `docker exec <container> n8n-sync <command>`. `normalize` is pure and also

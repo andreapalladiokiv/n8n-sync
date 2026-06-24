@@ -21,7 +21,7 @@ async function resolveTag(db: Db, name: string): Promise<string> {
   const found = await db.scalar<string>('SELECT id FROM tag_entity WHERE name=$1 ORDER BY "createdAt", id LIMIT 1', [name]);
   if (found) return found;
   const id = genId();
-  await db.exec('INSERT INTO tag_entity (id,name,"createdAt","updatedAt") VALUES ($1,$2,now(),now())', [id, name]);
+  await db.exec('INSERT INTO tag_entity (id,name,"createdAt","updatedAt") VALUES ($1,$2,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)', [id, name]);
   return id;
 }
 
@@ -85,13 +85,13 @@ export async function cmdImport(cfg: Config): Promise<number> {
       await db.tx(async (t) => {
         for (const fo of folders) {
           await t.exec(
-            `INSERT INTO folder (id,name,"projectId","createdAt","updatedAt") VALUES ($1,$2,$3,now(),now())
-             ON CONFLICT (id) DO UPDATE SET name=EXCLUDED.name, "projectId"=EXCLUDED."projectId", "updatedAt"=now()`,
+            `INSERT INTO folder (id,name,"projectId","createdAt","updatedAt") VALUES ($1,$2,$3,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)
+             ON CONFLICT (id) DO UPDATE SET name=EXCLUDED.name, "projectId"=EXCLUDED."projectId", "updatedAt"=CURRENT_TIMESTAMP`,
             [fo.id, fo.name, proj],
           );
         }
         for (const fo of folders) {
-          await t.exec(`UPDATE folder SET "parentFolderId"=$1, "updatedAt"=now() WHERE id=$2`, [fo.parentFolderId, fo.id]);
+          await t.exec(`UPDATE folder SET "parentFolderId"=$1, "updatedAt"=CURRENT_TIMESTAMP WHERE id=$2`, [fo.parentFolderId, fo.id]);
         }
       });
     }
@@ -130,8 +130,8 @@ export async function cmdImport(cfg: Config): Promise<number> {
           const wf = readWorkflow(f);
           await t.exec(`DELETE FROM shared_workflow WHERE "workflowId"=$1 AND role='workflow:owner'`, [id]);
           await t.exec(
-            `INSERT INTO shared_workflow ("workflowId","projectId",role,"createdAt","updatedAt") VALUES ($1,$2,'workflow:owner',now(),now())
-             ON CONFLICT ("workflowId","projectId") DO UPDATE SET role='workflow:owner', "updatedAt"=now()`,
+            `INSERT INTO shared_workflow ("workflowId","projectId",role,"createdAt","updatedAt") VALUES ($1,$2,'workflow:owner',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)
+             ON CONFLICT ("workflowId","projectId") DO UPDATE SET role='workflow:owner', "updatedAt"=CURRENT_TIMESTAMP`,
             [id, proj],
           );
           await t.exec(`UPDATE workflow_entity SET "parentFolderId"=$1 WHERE id=$2`, [wf.parentFolderId ?? null, id]);
@@ -172,7 +172,8 @@ export async function cmdImport(cfg: Config): Promise<number> {
         // Pre-publish in the DB so a mutual sub-workflow cycle resolves at publish-time,
         // THEN register the live trigger via the API. psql/DB alone won't register it.
         process.stderr.write(`==> Pre-publishing ${readyIds.length} workflow(s) in the DB (activeVersionId := versionId) ...\n`);
-        await db.exec(`UPDATE workflow_entity SET active=true, "activeVersionId"="versionId" WHERE id = ANY($1::text[])`, [readyIds]);
+        const ph = readyIds.map((_, i) => `$${i + 1}`).join(',');
+        await db.exec(`UPDATE workflow_entity SET active=true, "activeVersionId"="versionId" WHERE id IN (${ph})`, readyIds);
         if (cfg.apiKey) {
           process.stderr.write(`==> Activating ${readyIds.length} workflow(s) via the API (live — no restart) ...\n`);
           let remaining = [...readyIds];
@@ -211,9 +212,11 @@ export async function cmdImport(cfg: Config): Promise<number> {
     }
 
     // Verify presence in the DB.
-    const present = new Set(
-      (await db.rows<{ id: string }>(`SELECT id FROM workflow_entity WHERE id = ANY($1::text[])`, [gitIds])).map((r) => r.id),
-    );
+    const idPh = gitIds.map((_, i) => `$${i + 1}`).join(',');
+    const presentRows = gitIds.length
+      ? await db.rows<{ id: string }>(`SELECT id FROM workflow_entity WHERE id IN (${idPh})`, gitIds)
+      : [];
+    const present = new Set(presentRows.map((r) => r.id));
     let rc = 0;
     for (const id of gitIds) if (!present.has(id)) { process.stderr.write(`n8n-sync: id=${id} not found after import\n`); rc = 1; }
     if (rc === 0) {
