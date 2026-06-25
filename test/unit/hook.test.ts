@@ -42,3 +42,39 @@ test('hook: a burst coalesces into ONE export, serialized; a later change re-fir
   fs.rmSync(dir, { recursive: true, force: true });
   delete process.env.N8N_SYNC_BIN; delete process.env.N8N_SYNC_HOOK_DEBOUNCE_MS; delete process.env.LOG;
 });
+
+test('hook: maintains SCOPE_FILE — create adds, update renames, delete removes; absent file untouched', async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ns-hook-scope-'));
+  const scope = path.join(dir, 'workflow-ids.json');
+  const bin = path.join(dir, 'noop'); fs.writeFileSync(bin, '#!/usr/bin/env bash\ntrue\n'); fs.chmodSync(bin, 0o755);
+  process.env.N8N_SYNC_BIN = bin;
+
+  const require = createRequire(import.meta.url);
+  const hook = require('../../src/hook.cjs') as {
+    workflow: { afterCreate: Array<(w: unknown) => void>; afterUpdate: Array<(w: unknown) => void>; afterDelete: Array<(id: string) => void> };
+  };
+  const onCreate = hook.workflow.afterCreate[0]!, onUpdate = hook.workflow.afterUpdate[0]!, onDelete = hook.workflow.afterDelete[0]!;
+  const ids = (): Array<{ id: string; name: string }> => JSON.parse(fs.readFileSync(scope, 'utf8')).workflows;
+
+  process.env.SCOPE_FILE = scope;
+  onCreate({ id: 'a', name: 'Alpha' });
+  assert.equal(fs.existsSync(scope), false, 'absent scope must NOT be created (empty = all)');
+
+  fs.writeFileSync(scope, '{\n  "workflows": []\n}\n');
+  onCreate({ id: 'a', name: 'Alpha' });
+  assert.deepEqual(ids(), [{ id: 'a', name: 'Alpha' }], 'create adds {id,name}');
+  onUpdate({ id: 'a', name: 'Alpha v2' });
+  assert.deepEqual(ids(), [{ id: 'a', name: 'Alpha v2' }], 'update renames in place');
+  onUpdate({ id: 'a', name: 'Alpha v2' });
+  assert.equal(ids().length, 1, 'no-op update does not duplicate');
+  onUpdate({ id: 'untracked', name: 'Ghost' });
+  assert.deepEqual(ids().map((w) => w.id), ['a'], 'update of an UNtracked id must NOT add it to scope');
+  onCreate({ id: 'b', name: 'Beta' });
+  assert.equal(ids().length, 2, 'second create appends');
+  onDelete('a');
+  assert.deepEqual(ids(), [{ id: 'b', name: 'Beta' }], 'delete removes by id');
+
+  await delay(300); // drain any debounced (noop) export before cleanup
+  fs.rmSync(dir, { recursive: true, force: true });
+  delete process.env.N8N_SYNC_BIN; delete process.env.SCOPE_FILE;
+});

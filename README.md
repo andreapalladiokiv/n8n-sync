@@ -43,6 +43,23 @@ runs host-side (e.g. a pre-commit hook).
 consuming repo's `Makefile` (`make pull`), not in this engine. `init` is dropped — the
 project template scaffolds the repo.
 
+## Realtime hook (export-on-save, local/dev)
+
+`dist/hook.cjs` is an n8n **external hook**. Point n8n's `EXTERNAL_HOOK_FILES` at it and
+every UI save fires `workflow.afterCreate` / `afterUpdate` / `afterDelete`, on which it:
+
+1. maintains `SCOPE_FILE` (`workflow-ids.json`) — **add** on create, **rename** on update
+   (in place, only if already tracked), **remove** on delete. Skipped if the file is absent
+   (absent = "all" — never narrowed). Written in the repo's canonical shape so diffs stay minimal.
+2. runs `export` into `WORKFLOWS_DIR`, **debounced** (`N8N_SYNC_HOOK_DEBOUNCE_MS`, default 1500)
+   and **serialized** (a burst of saves coalesces into one export; exports never overlap).
+
+Needs a writable `WORKFLOWS_DIR` + `SCOPE_FILE` and the DB env. `N8N_SYNC_HOOK_DEBUG=1` traces
+which event fired with which id/name. **Mount the repo as a directory, not the scope file as a
+single file:** a single-file bind mount pins one inode, so any host-side replacement (`git
+checkout`/`pull`, branch switch, an editor's atomic write-rename) orphans it and the hook's
+writes silently stop reaching the host. A directory mount resolves the path fresh on each open.
+
 ## Configuration (env, overridable by flags)
 
 Precedence: **flag > env > default**.
