@@ -36,7 +36,7 @@ runs host-side (e.g. a pre-commit hook).
 |---|---|---|
 | `normalize [files…]` | host or container | Canonicalize workflow JSON in place (byte-identical to the legacy `jq -S` form). |
 | `export` | in-container | n8n → repo: export in-scope workflows, normalize, mirror the folder tree, write `folders.json`. Archived workflows are pruned from the repo. |
-| `import` | in-container | repo → n8n: id-preserving import, folder upsert, credential stubs, credential-aware + cycle-safe activation, orphan deactivation. |
+| `import` | in-container | repo → n8n: id-preserving import, folder upsert, credential stubs, credential-aware + cycle-safe activation. Orphans (removed from the repo) are **archived**; a workflow that's in the repo but archived in n8n is **un-archived** (restored). |
 | `projects` | in-container | List projects (`id\|name\|type`) to pick a project id. |
 
 `pull` is host orchestration (git + `docker exec` of export/import) and lives in the

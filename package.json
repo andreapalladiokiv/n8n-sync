@@ -1,6 +1,6 @@
 {
   "name": "@andreapalladiokiv/n8n-sync",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "CI/CD sync for n8n workflows — TypeScript engine, runs in-container (DB-agnostic: Postgres + SQLite via @n8n/typeorm + the n8n CLI) and host-side (normalize/validate).",
   "type": "module",
   "repository": {

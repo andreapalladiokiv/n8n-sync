@@ -36,6 +36,8 @@ export async function cmdImport(cfg: Config): Promise<number> {
   }
   if (files.length === 0) { process.stderr.write('==> No workflows in scope — nothing to import.\n'); return 0; }
   process.stderr.write(`==> Importing ${files.length} workflow(s) into the local n8n ...\n`);
+  const gitIds = files.map((f) => path.basename(f, '.json'));
+  const gitIdSet = new Set(gitIds);
 
   const db = await Db.open();
   try {
@@ -68,6 +70,23 @@ export async function cmdImport(cfg: Config): Promise<number> {
     }
     fs.rmSync(cur, { recursive: true, force: true });
     process.stderr.write(`==> ${changed.length} of ${files.length} changed (${files.length - changed.length} unchanged, skipped).\n`);
+
+    // RESTORE: workflows present in git but ARCHIVED in n8n must be un-archived (mirror of
+    // export, which prunes archived workflows). Force them through the pipeline so they get
+    // un-archived AND re-activated per their repo `active` flag — even if content is unchanged.
+    // Guarded: an older n8n without the `isArchived` column has nothing to restore.
+    let archivedGit: string[] = [];
+    try {
+      const aph = gitIds.map((_, i) => `$${i + 1}`).join(',');
+      archivedGit = gitIds.length
+        ? (await db.rows<{ id: string }>(`SELECT id FROM workflow_entity WHERE id IN (${aph}) AND "isArchived"`, gitIds)).map((r) => r.id)
+        : [];
+    } catch { /* no isArchived column → nothing to restore */ }
+    if (archivedGit.length) {
+      const archSet = new Set(archivedGit);
+      for (const f of files) if (archSet.has(path.basename(f, '.json')) && !changed.includes(f)) changed.push(f);
+      process.stderr.write(`==> ${archivedGit.length} workflow(s) in git are archived in n8n — restoring (un-archive)\n`);
+    }
 
     const foldersFile = path.join(cfg.workflowsDir, 'folders.json');
     const folders: FolderManifest[] = fs.existsSync(foldersFile)
@@ -145,6 +164,13 @@ export async function cmdImport(cfg: Config): Promise<number> {
         }
       });
 
+      // 3b. un-archive restored workflows in the DB so they can be (re)activated below
+      // (an archived workflow can't be active). Guarded for older n8n.
+      if (archivedGit.length) {
+        const uph = archivedGit.map((_, i) => `$${i + 1}`).join(',');
+        await db.exec(`UPDATE workflow_entity SET "isArchived"=false WHERE id IN (${uph})`, archivedGit).catch(() => undefined);
+      }
+
       // 4. activation — credential-aware + cycle-safe (changed set only).
       const readyIds: string[] = [];
       process.stderr.write('==> Resolving credential-readiness ...\n');
@@ -197,9 +223,9 @@ export async function cmdImport(cfg: Config): Promise<number> {
       }
     }
 
-    // Orphans: owned by $proj, in scope, gone from git → deactivate.
-    const gitIds = files.map((f) => path.basename(f, '.json'));
-    const gitIdSet = new Set(gitIds);
+    // Orphans: owned by $proj, in scope, gone from git → ARCHIVE (soft-delete), mirroring
+    // export (which prunes archived workflows from the repo). Deactivate first to deregister
+    // the trigger, then set isArchived. Guarded: older n8n without the column just deactivates.
     const owned = await db.rows<{ id: string; name: string }>(
       `SELECT we.id, we.name FROM workflow_entity we
        JOIN shared_workflow sw ON sw."workflowId"=we.id AND sw.role='workflow:owner'
@@ -207,8 +233,9 @@ export async function cmdImport(cfg: Config): Promise<number> {
     );
     for (const o of owned) {
       if (!inScope(o.id) || gitIdSet.has(o.id)) continue;
-      process.stderr.write(`  ⊟ '${o.name}' (id=${o.id}) not in git — deactivating; archive/delete it in the UI\n`);
+      process.stderr.write(`  ⊟ '${o.name}' (id=${o.id}) removed from git — archiving (deactivate + isArchived)\n`);
       if (cfg.apiKey) await setActive(o.id, false, cfg.apiKey).catch(() => undefined); else unpublishViaCli(o.id);
+      await db.exec(`UPDATE workflow_entity SET "isArchived"=true, active=false WHERE id=$1`, [o.id]).catch(() => undefined);
     }
 
     // Verify presence in the DB.
