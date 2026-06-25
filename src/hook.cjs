@@ -2,8 +2,8 @@
 // n8n EXTERNAL HOOK — shipped as part of n8n-sync (CommonJS: n8n loads hook files via
 // `require()`). On a workflow change it:
 //   1. keeps SCOPE_FILE (workflow-ids.json) mirroring the instance — ADD on create,
-//      RENAME on update, REMOVE on delete (only if the file already exists; an absent
-//      scope means "all" and must not be narrowed);
+//      RENAME on update, REMOVE on delete OR on archive (archiving is a soft-delete)
+//      (only if the file already exists; an absent scope means "all" and must not be narrowed);
 //   2. runs `n8n-sync export` into WORKFLOWS_DIR, debounced + serialized (a burst of
 //      saves coalesces into one export; exports never overlap).
 //
@@ -94,7 +94,14 @@ function onCreate(workflow) {
 }
 function onUpdate(workflow) {
   dbg('afterUpdate', workflow);
-  try { if (workflow && workflow.id != null) renameScope(String(workflow.id), workflow.name); } catch { /* non-fatal */ }
+  try {
+    if (workflow && workflow.id != null) {
+      // Archiving in n8n is a retire (soft-delete): drop it from the scope, like a delete.
+      // Its repo file is pruned by `export` (which skips archived workflows) on the next run.
+      if (workflow.isArchived) removeScope(String(workflow.id));
+      else renameScope(String(workflow.id), workflow.name);
+    }
+  } catch { /* non-fatal */ }
   schedule();
 }
 function onDelete(workflowId) {

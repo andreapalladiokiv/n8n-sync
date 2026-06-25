@@ -73,6 +73,8 @@ test('hook: maintains SCOPE_FILE — create adds, update renames, delete removes
   assert.equal(ids().length, 2, 'second create appends');
   onDelete('a');
   assert.deepEqual(ids(), [{ id: 'b', name: 'Beta' }], 'delete removes by id');
+  onUpdate({ id: 'b', name: 'Beta', isArchived: true });
+  assert.deepEqual(ids(), [], 'archiving (afterUpdate with isArchived) removes from scope like a delete');
 
   await delay(300); // drain any debounced (noop) export before cleanup
   fs.rmSync(dir, { recursive: true, force: true });

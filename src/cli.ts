@@ -11,7 +11,7 @@ import { cmdImport } from './commands/import';
 import { cmdProjects } from './commands/projects';
 import { cmdWatch } from './commands/watch';
 
-const VERSION = '1.2.0'; // keep in sync with package.json "version"
+const VERSION = '1.3.0'; // keep in sync with package.json "version"
 
 /** Shared options, attached per-subcommand so they work AFTER the command name. */
 function withSharedOptions(cmd: Command): Command {
