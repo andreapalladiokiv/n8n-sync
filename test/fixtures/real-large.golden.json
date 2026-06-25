@@ -1442,8 +1442,7 @@
       "alwaysOutputData": true,
       "credentials": {
         "postgres": {
-          "id": "hXZkgfuWSJSTX4OT",
-          "name": "Postgres"
+          "id": "hXZkgfuWSJSTX4OT"
         }
       },
       "id": "65d628eb-7123-4749-b01d-d1618c13d8b0",
@@ -1494,8 +1493,7 @@
     {
       "credentials": {
         "postgres": {
-          "id": "hXZkgfuWSJSTX4OT",
-          "name": "Postgres"
+          "id": "hXZkgfuWSJSTX4OT"
         }
       },
       "id": "00f2b18e-aefe-4ab3-b654-0bea7fdebff3",
@@ -1517,8 +1515,7 @@
     {
       "credentials": {
         "postgres": {
-          "id": "hXZkgfuWSJSTX4OT",
-          "name": "Postgres"
+          "id": "hXZkgfuWSJSTX4OT"
         }
       },
       "id": "8318b2f7-8445-43f9-8937-725bf63257d8",
@@ -1557,8 +1554,7 @@
     {
       "credentials": {
         "postgres": {
-          "id": "hXZkgfuWSJSTX4OT",
-          "name": "Postgres"
+          "id": "hXZkgfuWSJSTX4OT"
         }
       },
       "id": "d5c6d8a6-971c-49d0-96a9-c140d7b826d8",
@@ -1700,8 +1696,7 @@
     {
       "credentials": {
         "postgres": {
-          "id": "hXZkgfuWSJSTX4OT",
-          "name": "Postgres"
+          "id": "hXZkgfuWSJSTX4OT"
         }
       },
       "id": "e5f21e2c-26b3-482a-b200-69c1790a9eed",
@@ -1770,8 +1765,7 @@
     {
       "credentials": {
         "postgres": {
-          "id": "hXZkgfuWSJSTX4OT",
-          "name": "Postgres"
+          "id": "hXZkgfuWSJSTX4OT"
         }
       },
       "id": "7818b419-3e03-4779-a681-d1cfac47d21c",
@@ -2069,8 +2063,7 @@
     {
       "credentials": {
         "postgres": {
-          "id": "hXZkgfuWSJSTX4OT",
-          "name": "Postgres"
+          "id": "hXZkgfuWSJSTX4OT"
         }
       },
       "id": "801b294d-e5fd-4759-a105-21bdab65c95e",
@@ -2388,8 +2381,7 @@
     {
       "credentials": {
         "postgres": {
-          "id": "hXZkgfuWSJSTX4OT",
-          "name": "Postgres"
+          "id": "hXZkgfuWSJSTX4OT"
         }
       },
       "id": "e3fbc8be-a6f7-489b-9a97-3121fae7c3f1",
@@ -2850,8 +2842,7 @@
     {
       "credentials": {
         "postgres": {
-          "id": "hXZkgfuWSJSTX4OT",
-          "name": "Postgres"
+          "id": "hXZkgfuWSJSTX4OT"
         }
       },
       "id": "56825d60-71d4-4d71-afd6-279d51458109",
@@ -3453,8 +3444,7 @@
     {
       "credentials": {
         "postgres": {
-          "id": "hXZkgfuWSJSTX4OT",
-          "name": "Postgres"
+          "id": "hXZkgfuWSJSTX4OT"
         }
       },
       "id": "789dcaa6-f3df-412b-8c66-d48fea870240",
@@ -3758,8 +3748,7 @@
     {
       "credentials": {
         "postgres": {
-          "id": "hXZkgfuWSJSTX4OT",
-          "name": "Postgres"
+          "id": "hXZkgfuWSJSTX4OT"
         }
       },
       "id": "af45ed92-6f7e-486c-88ea-d2610fcc17a5",
@@ -4111,8 +4100,7 @@
     {
       "credentials": {
         "openAiApi": {
-          "id": "llAQampncp8P5l8I",
-          "name": "Input guardrail"
+          "id": "llAQampncp8P5l8I"
         }
       },
       "id": "a24e610d-99c6-4854-97a6-c9ac15b863e7",
@@ -4467,8 +4455,7 @@
     {
       "credentials": {
         "postgres": {
-          "id": "hXZkgfuWSJSTX4OT",
-          "name": "Postgres"
+          "id": "hXZkgfuWSJSTX4OT"
         }
       },
       "id": "1a521153-7c51-4379-a07c-d12d70ab544f",
@@ -5072,8 +5059,7 @@
     {
       "credentials": {
         "postgres": {
-          "id": "hXZkgfuWSJSTX4OT",
-          "name": "Postgres"
+          "id": "hXZkgfuWSJSTX4OT"
         }
       },
       "id": "7f928e4d-0e9c-4a0c-b6e4-dd34ef56d135",
@@ -5214,8 +5200,7 @@
     {
       "credentials": {
         "postgres": {
-          "id": "hXZkgfuWSJSTX4OT",
-          "name": "Postgres"
+          "id": "hXZkgfuWSJSTX4OT"
         }
       },
       "id": "740e7658-2f56-408a-8ac3-4f57472c7a59",

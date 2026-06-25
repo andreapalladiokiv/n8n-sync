@@ -45,8 +45,7 @@
       "alwaysOutputData": true,
       "credentials": {
         "supabaseApi": {
-          "id": "vMll0eHd6kbj9lN6",
-          "name": "Supabase"
+          "id": "vMll0eHd6kbj9lN6"
         }
       },
       "id": "ca67377f-4504-45e2-a153-e1aff9cded93",
@@ -73,8 +72,7 @@
     {
       "credentials": {
         "supabaseApi": {
-          "id": "vMll0eHd6kbj9lN6",
-          "name": "Supabase"
+          "id": "vMll0eHd6kbj9lN6"
         }
       },
       "id": "1d18ec38-21be-471c-be7a-531d26c572a2",

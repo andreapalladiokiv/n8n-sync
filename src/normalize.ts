@@ -32,6 +32,28 @@ export function normalizeWorkflow(input: Workflow): Workflow {
   const tags = (Array.isArray(w.tags) ? w.tags : []).map(tagName);
   w.tags = [...new Set(tags)].sort();
   w.settings = w.settings ?? {};
+  // A node credential reference is `{ id, name }`, but `name` is the credential's
+  // DISPLAY label on whatever instance the workflow was exported from — the same id is
+  // named differently on each instance, so it perpetually diffs (and isn't portable).
+  // The id is the authoritative link; drop `name` (n8n re-resolves it from the id).
+  if (Array.isArray(w.nodes)) {
+    w.nodes = (w.nodes as Record<string, unknown>[]).map((node) => {
+      const creds = node && typeof node === 'object' ? (node.credentials as Record<string, unknown> | undefined) : undefined;
+      if (!creds || typeof creds !== 'object') return node;
+      const out: Record<string, unknown> = {};
+      for (const t of Object.keys(creds)) {
+        const ref = creds[t];
+        if (ref && typeof ref === 'object' && 'id' in (ref as object)) {
+          const cleaned = { ...(ref as Record<string, unknown>) };
+          delete cleaned.name;
+          out[t] = cleaned;
+        } else {
+          out[t] = ref;
+        }
+      }
+      return { ...node, credentials: out };
+    });
+  }
   return w;
 }
 

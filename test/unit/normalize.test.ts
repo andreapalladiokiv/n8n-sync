@@ -35,6 +35,27 @@ test('normalizeWorkflow preserves an explicit parentFolderId and does not mutate
   assert.equal('staticData' in input, false, 'input must not be mutated');
 });
 
+test('normalizeWorkflow strips credential-reference name (instance-specific), keeps id', () => {
+  const w = normalizeWorkflow({
+    nodes: [
+      { name: 'n1', credentials: { openAiApi: { id: 'abc', name: 'BDI VA > Sales VA' } } },
+      { name: 'n2', credentials: { httpBasicAuth: { id: 'def', name: 'ClickHouse - admin' } } },
+      { name: 'n3' }, // no credentials → untouched
+    ],
+  });
+  const nodes = w.nodes as Array<Record<string, unknown>>;
+  assert.deepEqual(nodes[0].credentials, { openAiApi: { id: 'abc' } }, 'name dropped, id kept');
+  assert.deepEqual(nodes[1].credentials, { httpBasicAuth: { id: 'def' } });
+  assert.equal('credentials' in nodes[2], false, 'node without creds untouched');
+});
+
+test('normalizeWorkflow does not mutate input node credentials', () => {
+  const input = { nodes: [{ credentials: { openAiApi: { id: 'abc', name: 'X' } } }] };
+  const before = JSON.stringify(input);
+  normalizeWorkflow(input);
+  assert.equal(JSON.stringify(input), before, 'input must not be mutated');
+});
+
 test('sortKeysDeep sorts keys recursively at every depth', () => {
   const out = sortKeysDeep({ b: 1, a: { d: 1, c: [{ z: 1, y: 2 }] } });
   assert.equal(JSON.stringify(out), JSON.stringify({ a: { c: [{ y: 2, z: 1 }], d: 1 }, b: 1 }));
