@@ -3,27 +3,19 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Command } from 'commander';
 import { serializeWorkflow } from './normalize';
-import { resolveConfig } from './config';
-import type { Config } from './config';
 import { walkWorkflowJson } from './fsutil';
-import { cmdExport } from './commands/export';
-import { cmdImport } from './commands/import';
-import { cmdProjects } from './commands/projects';
-import { cmdWatch } from './commands/watch';
 
-const VERSION = '1.6.0'; // keep in sync with package.json "version"
+// n8n-sync 2.x HOST CLI. The DB-touching work (export/import/projects + realtime export) now
+// runs INSIDE the n8n process via the drop-in commands `n8n n8n-sync:{export,import,projects}`
+// (dist/n8n-cmd/, mounted into n8n's dist/commands) and the external hook (dist/hook.cjs) — all
+// reusing n8n's own DataSource + ImportService, so this host bundle carries NO DB driver. What
+// remains host-side is pure JSON work: `normalize` (+ `hook-path` for EXTERNAL_HOOK_FILES wiring).
+// The consuming Makefile's `make export/import/projects` `docker exec`s the in-container commands.
 
-/** Shared options, attached per-subcommand so they work AFTER the command name. */
-function withSharedOptions(cmd: Command): Command {
-  return cmd
-    .option('--dry-run', 'plan only; perform no mutations')
-    .option('--project-id <id>', 'project that owns workflows + folders [env N8N_PROJECT_ID]')
-    .option('--workflows-dir <dir>', 'repo dir for workflow JSON [env WORKFLOWS_DIR]')
-    .option('--scope-file <path>', 'JSON scope limiting which workflows sync [env SCOPE_FILE]');
-}
+const VERSION = '2.0.0-alpha.1'; // keep in sync with package.json "version"
 
-function runNormalize(files: string[], cfg: Config): void {
-  const targets = files.length ? files : walkWorkflowJson(cfg.workflowsDir);
+function runNormalize(files: string[], workflowsDir: string, dryRun: boolean): void {
+  const targets = files.length ? files : walkWorkflowJson(workflowsDir);
   let changed = 0;
   for (const f of targets) {
     if (path.basename(f) === 'folders.json') continue;
@@ -32,7 +24,7 @@ function runNormalize(files: string[], cfg: Config): void {
     if (after === before) continue;
     changed++;
     const rel = path.relative(process.cwd(), f);
-    if (cfg.dryRun) process.stderr.write(`would normalize ${rel}\n`);
+    if (dryRun) process.stderr.write(`would normalize ${rel}\n`);
     else { fs.writeFileSync(f, after); process.stderr.write(`normalized ${rel}\n`); }
   }
   if (changed === 0) process.stderr.write('all workflow JSON already canonical\n');
@@ -41,22 +33,18 @@ function runNormalize(files: string[], cfg: Config): void {
 const program = new Command();
 program
   .name('n8n-sync')
-  .description('CI/CD sync for n8n workflows — runs inside the n8n container (pg + n8n CLI)')
+  .description('CI/CD sync for n8n workflows — host side (normalize); export/import run in-container (`n8n n8n-sync:*`)')
   .version(VERSION, '--version', 'output the version number')
   .enablePositionalOptions()
   .showHelpAfterError();
 
-withSharedOptions(program.command('normalize [files...]'))
+program.command('normalize [files...]')
   .description('canonicalize workflow JSON in place (all under --workflows-dir if none given)')
-  .action((files: string[], _opts: unknown, cmd: Command) => runNormalize(files, resolveConfig(cmd)));
-
-withSharedOptions(program.command('export'))
-  .description('n8n -> repo: export in-scope workflows, normalize, mirror the folder tree')
-  .action(async (_opts: unknown, cmd: Command) => { await cmdExport(resolveConfig(cmd)); });
-
-withSharedOptions(program.command('import'))
-  .description('repo -> n8n: id-preserving import, folders, credential-aware + cycle-safe activation')
-  .action(async (_opts: unknown, cmd: Command) => { process.exitCode = await cmdImport(resolveConfig(cmd)); });
+  .option('--workflows-dir <dir>', 'repo dir for workflow JSON [env WORKFLOWS_DIR]')
+  .option('--dry-run', 'plan only; write nothing')
+  .action((files: string[], opts: { workflowsDir?: string; dryRun?: boolean }) => {
+    runNormalize(files, opts.workflowsDir ?? process.env.WORKFLOWS_DIR ?? 'workflows', opts.dryRun ?? false);
+  });
 
 program.command('hook-path')
   .description('print the path to the bundled n8n external hook (for EXTERNAL_HOOK_FILES)')
@@ -65,23 +53,18 @@ program.command('hook-path')
     process.stdout.write(`${path.join(dir, 'hook.cjs')}\n`);
   });
 
-program.command('pull')
-  .description('(host orchestration) export -> git pull -> import — run via `make pull`, not in-container')
-  .action(() => {
-    process.stderr.write('n8n-sync: `pull` is host-side orchestration (git + docker exec export/import); run it from the Makefile (`make pull`), not the in-container engine.\n');
-    process.exit(2);
-  });
-
-withSharedOptions(program.command('projects'))
-  .description("list the target's projects (id|name|type) to pick a --project-id")
-  .action(async () => { await cmdProjects(); });
-
-withSharedOptions(program.command('watch'))
-  .description('poll the instance and export on change — independent real-time mirror (local sidecar)')
-  .option('--interval <seconds>', 'poll interval in seconds', '3')
-  .action(async (opts: { interval?: string }, cmd: Command) => {
-    await cmdWatch(resolveConfig(cmd), Math.max(1, Number(opts.interval ?? 3)) * 1000);
-  });
+for (const moved of ['export', 'import', 'projects']) {
+  program.command(moved)
+    .description(`(moved) runs IN the n8n container in 2.x — use \`docker exec <n8n> n8n n8n-sync:${moved}\``)
+    .allowUnknownOption()
+    .action(() => {
+      process.stderr.write(
+        `n8n-sync 2.x: \`${moved}\` runs INSIDE the n8n container now — \`docker exec <container> n8n n8n-sync:${moved}\` ` +
+        `(reuses n8n's DataSource + services; no REST). The Makefile's \`make ${moved}\` wrapper does this.\n`,
+      );
+      process.exit(2);
+    });
+}
 
 program.parseAsync(process.argv).catch((err: unknown) => {
   process.stderr.write(`${err instanceof Error ? err.message : String(err)}\n`);

@@ -1,6 +1,15 @@
 import { build } from 'esbuild';
 import { chmodSync, copyFileSync } from 'node:fs';
 
+// n8n-sync 2.x build. THREE artifacts, none of which bundles a DB driver — all DB work now runs
+// inside the n8n process against n8n's OWN DataSource + services (see src/incontainer/bridge.ts):
+//   1. dist/n8n-sync.mjs        — host CLI (normalize / hook-path), pure JSON, no deps.
+//   2. dist/n8n-cmd/{export,import,projects}.js — drop-in n8n CLI commands, mounted into
+//      <n8nRoot>/dist/commands/n8n-sync/ → `n8n n8n-sync:export|import|projects`.
+//   3. dist/hook.cjs            — external hook (EXTERNAL_HOOK_FILES): in-process export-on-save.
+// n8n's modules are resolved at RUNTIME via the bridge (dynamic createRequire), never statically
+// imported, so esbuild bundles none of n8n / typeorm / pg.
+
 const OUT = 'dist/n8n-sync.mjs';
 
 await build({
@@ -10,43 +19,48 @@ await build({
   format: 'esm',
   target: 'node18',
   outfile: OUT,
-  // Minify to shrink the bundled TypeORM (~2.3M → ~1.0M). Identifier-minification is safe
-  // here: we use TypeORM with `entities: []` (no name-based entity metadata), and the full
-  // path — DataSource init, raw queries, QueryRunner transactions, a real import — was
-  // verified working minified (so no `keepNames`). `legalComments:'none'` drops licenses.
   minify: true,
   legalComments: 'none',
-  // Self-contained bundle: `@n8n/typeorm` + `pg` (pure JS) are bundled IN, so the engine
-  // carries its own DB layer and needs nothing resolved from n8n's install at runtime.
-  // TypeORM lazily `require()`s every optional driver; the NATIVE ones (and drivers we
-  // don't use) can't/shouldn't be bundled → keep them external. The pg path needs none of
-  // them; `sqlite3` is only touched for DB_TYPE=sqlite (native — must be present at runtime).
-  external: [
-    'sqlite3', 'better-sqlite3', 'mysql2', 'mysql', 'pg-native', 'pg-query-stream',
-    'mongodb', 'oracledb', 'mssql', 'ioredis', 'redis', 'sql.js', 'react-native-sqlite-storage',
-    'typeorm-aurora-data-api-driver', '@sap/hana-client', 'hdb-pool', '@google-cloud/spanner', '@sentry/node',
-  ],
   banner: {
-    // 1) shebang so the bundle is directly executable as the `n8n-sync` bin.
-    // 2) require shim — commander 13.x ships CommonJS; an ESM bundle's __require would
-    //    otherwise throw "Dynamic require of node:events" at startup. Mandatory.
-    // 3) __filename/__dirname — some CJS transitive deps of typeorm (e.g. app-root-path)
-    //    read them, and an ESM bundle has neither. Mandatory for the bundle to load.
+    // shebang (directly executable bin) + a require shim, since commander 13.x is CommonJS and an
+    // ESM bundle's __require would otherwise throw "Dynamic require of node:events" at startup.
     js:
       "#!/usr/bin/env node\n" +
       "import { createRequire as __ns_cr } from 'node:module';\n" +
-      "import { fileURLToPath as __ns_ftp } from 'node:url';\n" +
-      "import { dirname as __ns_dn } from 'node:path';\n" +
-      "const require = __ns_cr(import.meta.url);\n" +
-      "const __filename = __ns_ftp(import.meta.url);\n" +
-      "const __dirname = __ns_dn(__filename);",
+      "const require = __ns_cr(import.meta.url);",
   },
 });
-
 chmodSync(OUT, 0o755);
 
-// Ship the n8n external hook (plain CJS — n8n loads hook files via require()) next
-// to the bundle, so it can resolve the sibling CLI at runtime. Copied verbatim.
-copyFileSync('src/hook.cjs', 'dist/hook.cjs');
+// In-container drop-in commands (CJS — n8n loads command files via require()).
+await build({
+  entryPoints: {
+    export: 'src/incontainer/cmd-export.ts',
+    import: 'src/incontainer/cmd-import.ts',
+    projects: 'src/incontainer/cmd-projects.ts',
+  },
+  bundle: true,
+  platform: 'node',
+  format: 'cjs',
+  target: 'node18',
+  outdir: 'dist/n8n-cmd',
+  minify: true,
+  legalComments: 'none',
+});
 
-console.error(`built ${OUT} + dist/hook.cjs`);
+// External hook (CJS) — in-process export-on-save, reusing n8n's DataSource via the bridge. The
+// logic bundles to dist/hook-impl.cjs (named exports); the committed shim becomes dist/hook.cjs
+// (the EXTERNAL_HOOK_FILES entrypoint) and assembles the n8n hook shape from it.
+await build({
+  entryPoints: ['src/incontainer/hook.ts'],
+  bundle: true,
+  platform: 'node',
+  format: 'cjs',
+  target: 'node18',
+  outfile: 'dist/hook-impl.cjs',
+  minify: true,
+  legalComments: 'none',
+});
+copyFileSync('src/incontainer/hook-shim.cjs', 'dist/hook.cjs');
+
+console.error(`built ${OUT} + dist/hook.cjs (+hook-impl) + dist/n8n-cmd/{export,import,projects}.js`);

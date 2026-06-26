@@ -1,7 +1,7 @@
 {
   "name": "@andreapalladiokiv/n8n-sync",
-  "version": "1.6.0",
-  "description": "CI/CD sync for n8n workflows — TypeScript engine, runs in-container (DB-agnostic: Postgres + SQLite via @n8n/typeorm + the n8n CLI) and host-side (normalize/validate).",
+  "version": "2.0.0-alpha.1",
+  "description": "CI/CD sync for n8n workflows — TypeScript engine. 2.x runs INSIDE the n8n process (drop-in CLI commands + external hook) reusing n8n's own DataSource + ImportService (no bundled DB driver, no REST activation); host side does pure JSON normalize.",
   "type": "module",
   "repository": {
     "type": "git",
@@ -34,9 +34,5 @@
     "esbuild": "^0.28.0",
     "tsx": "^4.19.0",
     "typescript": "^5.6.0"
-  },
-  "dependencies": {
-    "@n8n/typeorm": "^0.3.20-16",
-    "pg": "^8.22.0"
   }
 }

@@ -1,112 +1,102 @@
 # n8n-sync (TypeScript engine)
 
-> **Status: `1.1.0`** — the TypeScript engine, published to GitHub Packages as
-> `@andreapalladiokiv/n8n-sync`. **DB-agnostic**: works against both Postgres- and
-> SQLite-backed n8n (since 1.1.0). Verified end-to-end on both — a full import + export
-> round-trip on SQLite, and `deploy.yml` green on a real Postgres VM.
+> **Status: `2.0.0-alpha.1`** — published to GitHub Packages as `@andreapalladiokiv/n8n-sync`.
+> **2.x is a clean break from 1.x**: instead of a self-contained bundle that opened its OWN
+> `@n8n/typeorm` DataSource and shelled out to the `n8n` CLI + REST API, 2.x runs **inside the n8n
+> process** and reuses n8n's OWN DataSource + services. No bundled DB driver, no `n8n` CLI
+> shell-out, no REST activation. (1.x lives at tag `v1.6.0`.)
 
-CI/CD sync for [n8n](https://n8n.io) workflows: version-control workflows in git and
-sync them with a running n8n instance, **id-preserving** (via the n8n CLI), with folder
-sync and credential-aware, cycle-safe activation.
+CI/CD sync for [n8n](https://n8n.io) workflows: version-control workflows in git and sync them with
+a running n8n instance, **id-preserving**, with folder sync and credential-aware, cycle-safe
+activation.
 
-## Architecture: runs *inside* the n8n container
+## Architecture: runs *inside* the n8n runtime
 
-Unlike the bash engine (which ran on the host and shelled in over `docker exec`), this
-engine is **baked into the n8n image and runs in-container**, where everything it needs
-already lives:
+The DB-touching work is done by code that executes **in n8n's own Node process**, where the live,
+already-migrated `DataSource` and every service/repository are registered in the process-wide
+`@n8n/di` Container. Two injection vectors, one shared engine (`src/incontainer/`):
 
-- **Database** — a hand-built `@n8n/typeorm` `DataSource` from n8n's own DB env,
-  **DB-agnostic** (Postgres + SQLite, chosen by `DB_TYPE`; no n8n DI). Parameterized
-  queries; the whole DB mutation runs in one transaction.
-- **Workflows** — the `n8n` CLI (`export/import:workflow`) via `child_process`, so entity
-  ids stay stable (the REST API cannot create-with-id).
-- **Activation** — the n8n REST API on `localhost` (`fetch`), so triggers register live.
+- **Drop-in CLI commands** — `dist/n8n-cmd/{export,import,projects}.js` are mounted into
+  `<n8nRoot>/dist/commands/n8n-sync/`, so `n8n n8n-sync:export|import|projects` dispatch through
+  n8n's own `CommandRegistry` (it dynamically `require()`s `./commands/<name>.js`). For batch sync.
+- **External hook** — `dist/hook.cjs` (via `EXTERNAL_HOOK_FILES`) does **in-process export-on-save**.
 
-`@n8n/typeorm` and the Postgres driver (`pg`) are **direct dependencies, bundled** into a
-single self-contained `dist/n8n-sync.mjs` (minified ~1 MB) — the engine carries its own DB
-layer and resolves nothing from n8n's install at runtime. Only the in-container `n8n` CLI
-is still required (for `export/import:workflow`). For `DB_TYPE=sqlite`, the native `sqlite3`
-driver must additionally be present (it can't be bundled); the Postgres path needs nothing extra.
+Both resolve n8n's own modules through `src/incontainer/bridge.ts` (a `createRequire` anchored at the
+n8n install root → the exact module instances n8n loaded → same singletons), and reuse:
 
-The host side (a Makefile / CI) is thin: put the repo workflows where the container can
-read them, then `docker exec <container> n8n-sync <command>`. `normalize` is pure and also
-runs host-side (e.g. a pre-commit hook).
+| n8n primitive | used for |
+|---|---|
+| `Container.get(DbConnection).dataSource` | the live, open connection (raw SQL for folders/tags/orphans/change-detection) |
+| `Container.get(WorkflowRepository).find()` | export reads (byte-parity with `export:workflow --all`) |
+| `Container.get(ImportService).importWorkflows(…, {activeState:'fromJson'})` | id-preserving `upsert(['id'])` + tags + owner + **cycle-safe in-process activation** |
+| `Container.get(ActiveWorkflowManager).remove()` | deregister triggers when archiving orphans |
+
+> The DataSource is reached via the `@n8n/db` `DbConnection` token (single copy), **not** the
+> `@n8n/typeorm` `DataSource` class token — there can be two `@n8n/typeorm` copies on disk and the
+> class identity must match the one n8n registered.
+
+The **host** bundle (`dist/n8n-sync.mjs`) now carries **no DB driver** — it does only pure JSON
+`normalize` (+ `hook-path`). It is ~40 KB (1.x was ~1 MB with typeorm+pg bundled).
 
 ## Commands
 
-| Command | Where it runs | What it does |
+| Command | Where | What |
 |---|---|---|
-| `normalize [files…]` | host or container | Canonicalize workflow JSON in place: sort keys, strip volatile + instance-specific fields — including node credential-reference **`name`** (the per-instance display label; the `id` is kept), so workflows stay portable + byte-stable across instances. |
-| `export` | in-container | n8n → repo: export in-scope workflows, normalize, mirror the folder tree, write `folders.json`. Archived workflows are pruned from the repo. |
-| `import` | in-container | repo → n8n: id-preserving import, folder upsert, credential stubs, credential-aware + cycle-safe activation. Orphans (removed from the repo) are **archived**; a workflow that's in the repo but archived in n8n is **un-archived** (restored). |
-| `projects` | in-container | List projects (`id\|name\|type`) to pick a project id. |
+| `n8n-sync normalize [files…]` | host | canonicalize workflow JSON in place (sort keys, strip volatile + instance-specific fields incl. node credential-ref `name`). |
+| `n8n-sync hook-path` | host | print the path to `dist/hook.cjs` for `EXTERNAL_HOOK_FILES`. |
+| `n8n n8n-sync:export` | in-container | n8n → repo: export in-scope workflows, normalize, mirror the folder tree, write `folders.json`; prune archived. |
+| `n8n n8n-sync:import` | in-container | repo → n8n: id-preserving import (`ImportService`), folders, cycle-safe in-process activation; archive orphans, restore (un-archive) workflows present in git. |
+| `n8n n8n-sync:projects` | in-container | list projects (`id\|name\|type`) to pick a project id. |
 
-`pull` is host orchestration (git + `docker exec` of export/import) and lives in the
-consuming repo's `Makefile` (`make pull`), not in this engine. `init` is dropped — the
-project template scaffolds the repo.
+Config is env-driven (flag-free in-container): `WORKFLOWS_DIR`, `SCOPE_FILE`, `N8N_PROJECT_ID`,
+`N8N_SYNC_DRY_RUN=1`. DB connection comes from n8n's own env (we reuse its DataSource).
+`export`/`import`/`projects` on the **host** bundle just print a pointer to the in-container form.
 
 ## Realtime hook (export-on-save, local/dev)
 
-`dist/hook.cjs` is an n8n **external hook**. Point n8n's `EXTERNAL_HOOK_FILES` at it and
-every UI save fires `workflow.afterCreate` / `afterUpdate` / `afterDelete`, on which it:
+`dist/hook.cjs` (`EXTERNAL_HOOK_FILES`) fires on `workflow.afterCreate/afterUpdate/afterDelete`. It
+maintains `SCOPE_FILE` (add/rename/remove; absent = "all", never narrowed) and runs the **in-process**
+export, **debounced** (`N8N_SYNC_HOOK_DEBOUNCE_MS`, default 1500) and **serialized**. Needs a writable
+`WORKFLOWS_DIR`/`SCOPE_FILE`. `dist/hook.cjs` requires its sibling `dist/hook-impl.cjs` — mount the
+whole `dist/` dir, not the single file.
 
-1. maintains `SCOPE_FILE` (`workflow-ids.json`) — **add** on create, **rename** on update
-   (in place, only if already tracked), **remove** on delete. Skipped if the file is absent
-   (absent = "all" — never narrowed). Written in the repo's canonical shape so diffs stay minimal.
-2. runs `export` into `WORKFLOWS_DIR`, **debounced** (`N8N_SYNC_HOOK_DEBOUNCE_MS`, default 1500)
-   and **serialized** (a burst of saves coalesces into one export; exports never overlap).
+## Deploying into n8n (consumer)
 
-Needs a writable `WORKFLOWS_DIR` + `SCOPE_FILE` and the DB env. `N8N_SYNC_HOOK_DEBUG=1` traces
-which event fired with which id/name. **Mount the repo as a directory, not the scope file as a
-single file:** a single-file bind mount pins one inode, so any host-side replacement (`git
-checkout`/`pull`, branch switch, an editor's atomic write-rename) orphans it and the hook's
-writes silently stop reaching the host. A directory mount resolves the path fresh on each open.
+Install from GitHub Packages (`.npmrc` scope + `read:packages` token), then mount the artifacts into
+the n8n container — **no image rebuild**:
 
-## Configuration (env, overridable by flags)
-
-Precedence: **flag > env > default**.
-
-| Env | Flag | Default | |
-|---|---|---|---|
-| `N8N_PROJECT_ID` | `--project-id` | oldest personal | project that owns imported workflows + folders |
-| `N8N_API_KEY` | — | — | present → live activation; empty → CLI publish (needs restart) |
-| `WORKFLOWS_DIR` | `--workflows-dir` | `workflows` | repo dir for workflow JSON |
-| `SCOPE_FILE` | `--scope-file` | `workflow-ids.json` | `{"workflows":[{id,name}]}`; empty = all |
-| `DB_POSTGRESDB_*` | — | (n8n's) | DB connection, read from n8n's own env (honors `_PASSWORD_FILE`, `_SSL_*`, `_SCHEMA`) |
-
-`--dry-run` plans without mutating.
-
-## Install (GitHub Packages)
-
-Published to GitHub Packages as `@andreapalladiokiv/n8n-sync`. Consumers point the
-scope at the GitHub registry in an `.npmrc` and authenticate with a `read:packages`
-token (in CI, a PAT secret or — for same-owner repos — `GITHUB_TOKEN`):
-
-```ini
-# .npmrc
-@andreapalladiokiv:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
+```yaml
+# docker-compose (n8n main service)
+environment:
+  EXTERNAL_HOOK_FILES: /opt/n8n-sync/hook.cjs   # realtime export-on-save
+  WORKFLOWS_DIR: /repo/workflows
+  SCOPE_FILE: /repo/workflow-ids.json
+volumes:
+  - .:/repo                                                                               # repo (workflows + scope)
+  - ./node_modules/@andreapalladiokiv/n8n-sync/dist:/opt/n8n-sync:ro                      # hook (+hook-impl)
+  - ./node_modules/@andreapalladiokiv/n8n-sync/dist/n8n-cmd:/usr/local/lib/node_modules/n8n/dist/commands/n8n-sync:ro  # drop-in CLI commands
 ```
 
-```sh
-npm install @andreapalladiokiv/n8n-sync          # or pin @1.0.0
-```
+Batch sync from the host then `docker exec`s the in-container commands, e.g.
+`docker exec -e WORKFLOWS_DIR=… -e SCOPE_FILE=… <container> n8n n8n-sync:import`.
 
-The single bin `n8n-sync` (→ `dist/n8n-sync.mjs`) is then on `PATH`/`npx`. To run the
-in-container commands, copy the bundle into the n8n container and exec it there:
-`docker exec <container> node /path/n8n-sync.mjs import` (or `n8n-sync import` once
-baked into the image). `normalize` is pure and runs host-side directly.
+## Version coupling (read before upgrading n8n)
 
-Releases publish automatically: pushing a `v*` tag triggers `.github/workflows/release.yml`.
+2.x depends on n8n **internals** that are not a public API: the `@n8n/di` Container, the
+`DbConnection`/`WorkflowRepository`/`ImportService`/`ActiveWorkflowManager` tokens, the
+`importWorkflows(…, {activeState})` signature, and the `CommandRegistry`'s dynamic-require dispatch.
+Only the external-hook **event names** are stable. **Pin the n8n version and smoke-test on every
+upgrade.** Notes: `activeState:'fromJson'` activation requires `EXECUTIONS_MODE=queue` (or multi-main);
+`ImportService` swallows activation errors (a workflow with missing credentials imports but stays
+inactive — fill creds, re-import).
 
 ## Develop
 
 ```sh
 npm install          # builds dist/ (prepare hook)
-npm test             # typecheck + build + unit tests + bundle byte-parity
+npm test             # typecheck + build + unit tests + normalize byte-parity
 npm run test:unit    # fast unit tests only
-N8N_SYNC_IT_CONTAINER=n8n npm run test:it   # in-container integration smoke
 ```
 
-Requirements: Node ≥ 18. Inside the n8n container only the `n8n` CLI must be present (it
-always is) — `pg` is bundled. (`DB_TYPE=sqlite` additionally needs the native `sqlite3`.)
+Requirements: Node ≥ 18. Inside the n8n container nothing extra is needed — the engine resolves
+n8n's own modules at runtime.
