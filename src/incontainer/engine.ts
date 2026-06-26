@@ -299,10 +299,12 @@ export async function runImport(cfg: EngineCfg): Promise<number> {
 
   // Orphans: owned by the project, in scope, gone from git → ARCHIVE (deactivate + isArchived),
   // mirroring export's pruning. Deregister the live trigger first.
+  // Candidates = NON-archived workflows owned by the project. Already-archived ones are excluded
+  // so we don't re-archive (and re-log) them on every import (the instance can hold hundreds).
   const owned = await ds.query(
     `SELECT we.id, we.name, we.active FROM workflow_entity we
      JOIN shared_workflow sw ON sw."workflowId"=we.id AND sw.role='workflow:owner'
-     WHERE sw."projectId"=$1`, [projectId],
+     WHERE sw."projectId"=$1 AND we."isArchived" = false`, [projectId],
   ) as { id: string; name: string; active: boolean }[];
   const awm = bridge.activeWorkflowManager();
   for (const o of owned) {
