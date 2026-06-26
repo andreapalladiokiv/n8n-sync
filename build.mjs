@@ -38,6 +38,7 @@ await build({
     export: 'src/incontainer/cmd-export.ts',
     import: 'src/incontainer/cmd-import.ts',
     projects: 'src/incontainer/cmd-projects.ts',
+    watch: 'src/incontainer/cmd-watch.ts',
   },
   bundle: true,
   platform: 'node',
@@ -77,4 +78,4 @@ await build({
 });
 copyFileSync('src/incontainer/hook-shim.cjs', 'dist/hook.cjs');
 
-console.error(`built ${OUT} + dist/hook.cjs (+hook-impl) + dist/n8n-cmd/{export,import,projects}.js`);
+console.error(`built ${OUT} + dist/hook.cjs (+hook-impl) + dist/preload.cjs + dist/n8n-cmd/{export,import,projects,watch}.js`);

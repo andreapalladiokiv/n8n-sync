@@ -1,6 +1,7 @@
 import * as bridge from './bridge';
 import { registerCommand } from './register';
 import { runExport, runImport, runProjects, envConfig } from './engine';
+import { runWatch } from './watch';
 
 // NODE_OPTIONS=--require=<this file> — registers n8n-sync's CLI commands into n8n's CommandMetadata
 // at PROCESS START, before the bin calls CommandRegistry.execute(). Wired purely by env (sibling to
@@ -15,3 +16,5 @@ bridge.pkg('reflect-metadata');
 registerCommand('n8n-sync:export', 'n8n-sync: export workflows from n8n into the repo (in-process)', () => runExport(envConfig()));
 registerCommand('n8n-sync:import', 'n8n-sync: import workflows from the repo into n8n (ImportService + in-process activation)', () => runImport(envConfig()));
 registerCommand('n8n-sync:projects', 'n8n-sync: list projects (id|name|type) to pick an N8N_PROJECT_ID', () => runProjects());
+registerCommand('n8n-sync:watch', 'n8n-sync: long-lived poller — export on change (sidecar alternative to the hook)',
+  () => runWatch(envConfig(), Math.max(1, Number(process.env.N8N_SYNC_WATCH_INTERVAL) || 3) * 1000));
