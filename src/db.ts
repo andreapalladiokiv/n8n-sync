@@ -1,34 +1,14 @@
-import { createRequire } from 'node:module';
 import fs from 'node:fs';
 import path from 'node:path';
+import { DataSource } from '@n8n/typeorm';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-// n8n's ORM (`@n8n/typeorm`, a TypeORM fork) is resolved at runtime from n8n's own
-// node_modules — the engine runs INSIDE the n8n container, where the ORM and the
-// driver n8n uses (pg / sqlite) are always present. We never bundle it.
-const codeOf = (e: unknown): string => (e as NodeJS.ErrnoException).code || String((e as Error).message || e);
-
-function loadTypeORM(): any {
-  const require = createRequire(import.meta.url);
-  const names = ['@n8n/typeorm', 'typeorm'];
-  const tried: string[] = [];
-  const n8nRequire = createRequire('/usr/local/lib/node_modules/n8n/package.json');
-  for (const n of names) { try { return n8nRequire(n); } catch (e) { tried.push(`n8n:${n}:${codeOf(e)}`); } }
-  const pnpm = '/usr/local/lib/node_modules/n8n/node_modules/.pnpm';
-  try {
-    for (const e of fs.readdirSync(pnpm)) {
-      for (const n of names) {
-        if (e.startsWith(n.replace('/', '+') + '@')) {
-          const p = path.join(pnpm, e, 'node_modules', n);
-          try { return n8nRequire(p); } catch (err) { tried.push(`${p}:${codeOf(err)}`); }
-        }
-      }
-    }
-  } catch { /* no pnpm layout */ }
-  for (const n of names) { try { return require(n); } catch (e) { tried.push(`${n}:${codeOf(e)}`); } }
-  throw new Error(`no resolvable @n8n/typeorm / typeorm in the n8n image (tried ${tried.join(', ')})`);
-}
+// Self-contained DB layer: `@n8n/typeorm` (+ the pure-JS `pg` driver) is a DIRECT
+// dependency, bundled into the single-file build — so the engine carries its own ORM and
+// resolves NOTHING from n8n's install at runtime. The Postgres path (what the consumers
+// use) needs no optional drivers. (DB_TYPE=sqlite would additionally need the native
+// `sqlite3` driver present at runtime — it can't be bundled; not installed by default.)
 
 const envFile = (v: string | undefined, f: string | undefined): string | undefined => {
   try { return f && fs.existsSync(f) ? fs.readFileSync(f, 'utf8').replace(/\s+$/, '') : v; }
@@ -57,7 +37,6 @@ export class Db {
   ) {}
 
   static async open(): Promise<Db> {
-    const TypeORM = loadTypeORM();
     const E = process.env;
     const dbType = (E.DB_TYPE || 'sqlite').toLowerCase();
 
@@ -85,7 +64,7 @@ export class Db {
       throw new Error(`n8n-sync: DB_TYPE='${dbType}' is not supported yet — only 'postgresdb' and 'sqlite' (MySQL/MariaDB: TBD).`);
     }
 
-    const ds = new TypeORM.DataSource({ ...opts, entities: [], synchronize: false, migrationsRun: false, logging: false });
+    const ds = new DataSource({ ...opts, entities: [], synchronize: false, migrationsRun: false, logging: false } as any);
     await ds.initialize();
     // SQLite is a file shared with the running n8n: wait on a lock instead of erroring.
     if (dialect === 'sqlite') await ds.query('PRAGMA busy_timeout = 10000');

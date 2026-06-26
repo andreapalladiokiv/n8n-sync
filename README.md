@@ -22,9 +22,11 @@ already lives:
   ids stay stable (the REST API cannot create-with-id).
 - **Activation** — the n8n REST API on `localhost` (`fetch`), so triggers register live.
 
-`@n8n/typeorm` and the DB driver (pg / sqlite) are **not bundled** — they are resolved at
-runtime from n8n's own `node_modules`. Everything else (incl. the CLI lib) bundles into a
-single `dist/n8n-sync.mjs`.
+`@n8n/typeorm` and the Postgres driver (`pg`) are **direct dependencies, bundled** into a
+single self-contained `dist/n8n-sync.mjs` (minified ~1 MB) — the engine carries its own DB
+layer and resolves nothing from n8n's install at runtime. Only the in-container `n8n` CLI
+is still required (for `export/import:workflow`). For `DB_TYPE=sqlite`, the native `sqlite3`
+driver must additionally be present (it can't be bundled); the Postgres path needs nothing extra.
 
 The host side (a Makefile / CI) is thin: put the repo workflows where the container can
 read them, then `docker exec <container> n8n-sync <command>`. `normalize` is pure and also
@@ -106,5 +108,5 @@ npm run test:unit    # fast unit tests only
 N8N_SYNC_IT_CONTAINER=n8n npm run test:it   # in-container integration smoke
 ```
 
-Requirements: Node ≥ 18. Inside the n8n container, `pg` and the `n8n` CLI must be present
-(they always are).
+Requirements: Node ≥ 18. Inside the n8n container only the `n8n` CLI must be present (it
+always is) — `pg` is bundled. (`DB_TYPE=sqlite` additionally needs the native `sqlite3`.)
