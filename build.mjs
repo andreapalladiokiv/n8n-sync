@@ -1,12 +1,12 @@
 import { build } from 'esbuild';
 import { chmodSync, copyFileSync } from 'node:fs';
 
-// n8n-sync 2.x build. THREE artifacts, none of which bundles a DB driver — all DB work now runs
-// inside the n8n process against n8n's OWN DataSource + services (see src/incontainer/bridge.ts):
-//   1. dist/n8n-sync.mjs        — host CLI (normalize / hook-path), pure JSON, no deps.
-//   2. dist/n8n-cmd/{export,import,projects}.js — drop-in n8n CLI commands, mounted into
-//      <n8nRoot>/dist/commands/n8n-sync/ → `n8n n8n-sync:export|import|projects`.
-//   3. dist/hook.cjs            — external hook (EXTERNAL_HOOK_FILES): in-process export-on-save.
+// n8n-sync 2.x build. TWO artifacts, neither bundles a DB driver — all DB work runs inside the n8n
+// process against n8n's OWN DataSource + services (see src/incontainer/bridge.ts):
+//   1. dist/n8n-sync.mjs — the bin. HOST: normalize / hook-path. IN-CONTAINER: export / import /
+//      projects, run as `docker exec <c> node n8n-sync.mjs <cmd>` (bridge.bootstrap brings up n8n's
+//      runtime; the engine reuses n8n's DataSource + ImportService). No registered n8n commands.
+//   2. dist/hook.cjs (+hook-impl.cjs) — external hook (EXTERNAL_HOOK_FILES): in-process export-on-save.
 // n8n's modules are resolved at RUNTIME via the bridge (dynamic createRequire), never statically
 // imported, so esbuild bundles none of n8n / typeorm / pg.
 
@@ -22,31 +22,22 @@ await build({
   minify: true,
   legalComments: 'none',
   banner: {
-    // shebang (directly executable bin) + a require shim, since commander 13.x is CommonJS and an
-    // ESM bundle's __require would otherwise throw "Dynamic require of node:events" at startup.
+    // 1) shebang (directly executable bin).
+    // 2) require shim — commander 13.x is CJS, and the bridge's createRequire/dynamic require of
+    //    n8n's modules needs a `require` in this ESM bundle.
+    // 3) __filename/__dirname — the bridge walks up from __dirname to locate the n8n install root;
+    //    an ESM bundle has neither, so synthesize them from import.meta.url.
     js:
       "#!/usr/bin/env node\n" +
       "import { createRequire as __ns_cr } from 'node:module';\n" +
-      "const require = __ns_cr(import.meta.url);",
+      "import { fileURLToPath as __ns_ftp } from 'node:url';\n" +
+      "import { dirname as __ns_dn } from 'node:path';\n" +
+      "const require = __ns_cr(import.meta.url);\n" +
+      "const __filename = __ns_ftp(import.meta.url);\n" +
+      "const __dirname = __ns_dn(__filename);",
   },
 });
 chmodSync(OUT, 0o755);
-
-// In-container drop-in commands (CJS — n8n loads command files via require()).
-await build({
-  entryPoints: {
-    export: 'src/incontainer/cmd-export.ts',
-    import: 'src/incontainer/cmd-import.ts',
-    projects: 'src/incontainer/cmd-projects.ts',
-  },
-  bundle: true,
-  platform: 'node',
-  format: 'cjs',
-  target: 'node18',
-  outdir: 'dist/n8n-cmd',
-  minify: true,
-  legalComments: 'none',
-});
 
 // External hook (CJS) — in-process export-on-save, reusing n8n's DataSource via the bridge. The
 // logic bundles to dist/hook-impl.cjs (named exports); the committed shim becomes dist/hook.cjs
@@ -63,4 +54,4 @@ await build({
 });
 copyFileSync('src/incontainer/hook-shim.cjs', 'dist/hook.cjs');
 
-console.error(`built ${OUT} + dist/hook.cjs (+hook-impl) + dist/n8n-cmd/{export,import,projects}.js`);
+console.error(`built ${OUT} + dist/hook.cjs (+hook-impl.cjs)`);
