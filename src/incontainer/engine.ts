@@ -5,7 +5,7 @@ import { serializeWorkflow } from '../normalize';
 import { buildFolderPath } from '../folders';
 import { walkWorkflowJson, removeEmptyDirs } from '../fsutil';
 import { scopeIds } from '../config';
-import type { Workflow } from '../workflow';
+import { credsOf, type Workflow, type Cred } from '../workflow';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -132,6 +132,37 @@ async function resolveProjectAndUser(cfg: EngineCfg): Promise<{ projectId: strin
   return { projectId: project.id as string, userId };
 }
 
+/** Seed EMPTY credential stubs (id-preserving) for creds referenced by the changed workflows but
+ *  absent on the instance. A workflow references creds by id; the UI can't create a cred with a
+ *  specific id, so without the stub the reference dangles forever. The stub (empty, encrypted,
+ *  isManaged:false, owned by the project) lets the user fill the secret IN PLACE in the UI — the id
+ *  stays, refs resolve, activation succeeds on the next import. Never overwrites an existing cred. */
+async function seedCredentialStubs(ds: any, changedFiles: string[], projectId: string): Promise<void> {
+  const needed = new Map<string, Cred>();
+  for (const f of changedFiles) for (const c of credsOf(readJson(f), false)) if (!needed.has(c.id)) needed.set(c.id, c);
+  if (needed.size === 0) return;
+  const ids = [...needed.keys()];
+  const have = new Set((await ds.query('SELECT id FROM credentials_entity WHERE id = ANY($1)', [ids]) as { id: string }[]).map((r) => r.id));
+  const missing = ids.filter((id) => !have.has(id)).map((id) => needed.get(id)!);
+  if (missing.length === 0) return;
+
+  err(`==> Seeding ${missing.length} empty credential stub(s) — fill the secrets in the n8n UI (edit the stub), then re-import:\n`);
+  const cipher = bridge.get<any>(bridge.pkg('n8n-core').Cipher);
+  const emptyData: string = await cipher.encryptV2({}); // encrypted empty data, like `import:credentials`
+  const { CredentialsRepository, SharedCredentialsRepository } = bridge.repos();
+  const credRepo = bridge.get<any>(CredentialsRepository);
+  const shareRepo = bridge.get<any>(SharedCredentialsRepository);
+  for (const c of missing) {
+    try {
+      await credRepo.insert({ id: c.id, name: c.name || c.type, type: c.type, data: emptyData, isManaged: false });
+      await shareRepo.upsert({ credentialsId: c.id, projectId, role: 'credential:owner' }, ['credentialsId', 'projectId']);
+      err(`  + ${c.name || c.type} [${c.type}] id=${c.id}\n`);
+    } catch (e) {
+      err(`  ⚠ could not seed stub id=${c.id} (${String((e as Error)?.message ?? e).slice(0, 120)}) — non-fatal\n`);
+    }
+  }
+}
+
 export async function runImport(cfg: EngineCfg): Promise<number> {
   const scope = new Set(scopeIds(cfg.scopeFile));
   const inScope = (id: string): boolean => scope.size === 0 || scope.has(id);
@@ -205,6 +236,10 @@ export async function runImport(cfg: EngineCfg): Promise<number> {
   if (changedFiles.length === 0) {
     err('==> No changed workflows — skipping import + activation (no downtime).\n');
   } else {
+    // Seed empty stubs for referenced-but-missing creds FIRST, so the workflows' credential
+    // references resolve (and the user can fill the secrets in place later).
+    await seedCredentialStubs(ds, changedFiles, projectId);
+
     // Hand the changed set to n8n's own ImportService: id-preserving upsert(['id']) + owner +
     // tags + WorkflowHistory + CYCLE-SAFE in-process activation (activeState:'fromJson' respects
     // each workflow's `active`). No CLI, no REST. NB the queue-mode guard lives in the stock
