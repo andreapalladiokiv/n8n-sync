@@ -300,15 +300,19 @@ export async function runImport(cfg: EngineCfg): Promise<number> {
   // Orphans: owned by the project, in scope, gone from git → ARCHIVE (deactivate + isArchived),
   // mirroring export's pruning. Deregister the live trigger first.
   const owned = await ds.query(
-    `SELECT we.id, we.name FROM workflow_entity we
+    `SELECT we.id, we.name, we.active FROM workflow_entity we
      JOIN shared_workflow sw ON sw."workflowId"=we.id AND sw.role='workflow:owner'
      WHERE sw."projectId"=$1`, [projectId],
-  ) as { id: string; name: string }[];
+  ) as { id: string; name: string; active: boolean }[];
   const awm = bridge.activeWorkflowManager();
   for (const o of owned) {
     if (!inScope(o.id) || gitIdSet.has(o.id)) continue;
     err(`  ⊟ '${o.name}' (id=${o.id}) removed from git — archiving (deactivate + isArchived)\n`);
-    try { await awm.remove(o.id); } catch { /* not active / already gone */ }
+    // Deregister live triggers only for an ACTIVE workflow — an inactive one has none, and calling
+    // ActiveWorkflowManager.remove() on it just makes n8n's clearWebhooks log "Active version not
+    // found". remove() self-catches a broken/missing active version (it errorReporter-logs but does
+    // not throw), so this is best-effort either way; the DB update below is the authoritative state.
+    if (o.active) { try { await awm.remove(o.id); } catch { /* best-effort */ } }
     await ds.query(`UPDATE workflow_entity SET "isArchived"=true, active=false, "activeVersionId"=NULL WHERE id=$1`, [o.id]);
   }
 
