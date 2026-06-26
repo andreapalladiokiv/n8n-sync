@@ -14,15 +14,12 @@ activation.
 
 The DB-touching work is done by code that executes **in n8n's own Node process**, where the live,
 already-migrated `DataSource` and every service/repository are registered in the process-wide
-`@n8n/di` Container. One shared engine (`src/incontainer/`), reached two ways — **no registered n8n
-commands, no mounting into n8n's `dist/commands`**:
+`@n8n/di` Container. Two injection vectors, one shared engine (`src/incontainer/`):
 
-- **The bundle, run as a node script** — `docker exec <c> node n8n-sync.mjs export|import|projects`
-  (exactly as 1.x / the deploy did). `bridge.bootstrap()` brings up the minimum of n8n's runtime in
-  this standalone process (reflect-metadata → GlobalConfig → `ModuleRegistry.loadModules()`), then
-  the engine reuses n8n's DataSource + services. For batch sync.
-- **External hook** — `dist/hook.cjs` (via `EXTERNAL_HOOK_FILES`) runs in the live server process and
-  does **in-process export-on-save** (no bootstrap needed — the server already did it).
+- **Drop-in CLI commands** — `dist/n8n-cmd/{export,import,projects}.js` are mounted into
+  `<n8nRoot>/dist/commands/n8n-sync/`, so `n8n n8n-sync:export|import|projects` dispatch through
+  n8n's own `CommandRegistry` (it dynamically `require()`s `./commands/<name>.js`). For batch sync.
+- **External hook** — `dist/hook.cjs` (via `EXTERNAL_HOOK_FILES`) does **in-process export-on-save**.
 
 Both resolve n8n's own modules through `src/incontainer/bridge.ts` (a `createRequire` anchored at the
 n8n install root → the exact module instances n8n loaded → same singletons), and reuse:
@@ -38,8 +35,8 @@ n8n install root → the exact module instances n8n loaded → same singletons),
 > `@n8n/typeorm` `DataSource` class token — there can be two `@n8n/typeorm` copies on disk and the
 > class identity must match the one n8n registered.
 
-The single bundle (`dist/n8n-sync.mjs`) carries **no DB driver** — it is ~52 KB (1.x was ~1 MB with
-typeorm+pg bundled). It is both the host tool and the in-container entrypoint.
+The **host** bundle (`dist/n8n-sync.mjs`) now carries **no DB driver** — it does only pure JSON
+`normalize` (+ `hook-path`). It is ~40 KB (1.x was ~1 MB with typeorm+pg bundled).
 
 ## Commands
 
@@ -47,14 +44,13 @@ typeorm+pg bundled). It is both the host tool and the in-container entrypoint.
 |---|---|---|
 | `n8n-sync normalize [files…]` | host | canonicalize workflow JSON in place (sort keys, strip volatile + instance-specific fields incl. node credential-ref `name`). |
 | `n8n-sync hook-path` | host | print the path to `dist/hook.cjs` for `EXTERNAL_HOOK_FILES`. |
-| `node n8n-sync.mjs export` | in-container | n8n → repo: export in-scope workflows, normalize, mirror the folder tree, write `folders.json`; prune archived. |
-| `node n8n-sync.mjs import` | in-container | repo → n8n: id-preserving import (`ImportService`), folders, credential stubs, cycle-safe in-process activation; archive orphans, restore (un-archive) workflows present in git. |
-| `node n8n-sync.mjs projects` | in-container | list projects (`id\|name\|type`) to pick a project id. |
+| `n8n n8n-sync:export` | in-container | n8n → repo: export in-scope workflows, normalize, mirror the folder tree, write `folders.json`; prune archived. |
+| `n8n n8n-sync:import` | in-container | repo → n8n: id-preserving import (`ImportService`), folders, cycle-safe in-process activation; archive orphans, restore (un-archive) workflows present in git. |
+| `n8n n8n-sync:projects` | in-container | list projects (`id\|name\|type`) to pick a project id. |
 
-The in-container commands run as a standalone `node` process inside the n8n container (e.g. via
-`docker exec`), NOT as registered `n8n` subcommands. Config is env-driven: `WORKFLOWS_DIR`,
-`SCOPE_FILE`, `N8N_PROJECT_ID`, `N8N_SYNC_DRY_RUN=1`. DB connection comes from n8n's own env (we reuse
-its DataSource). Run on the host, the in-container commands fail fast (no n8n install to resolve).
+Config is env-driven (flag-free in-container): `WORKFLOWS_DIR`, `SCOPE_FILE`, `N8N_PROJECT_ID`,
+`N8N_SYNC_DRY_RUN=1`. DB connection comes from n8n's own env (we reuse its DataSource).
+`export`/`import`/`projects` on the **host** bundle just print a pointer to the in-container form.
 
 ## Realtime hook (export-on-save, local/dev)
 
@@ -70,27 +66,27 @@ Install from GitHub Packages (`.npmrc` scope + `read:packages` token), then moun
 the n8n container — **no image rebuild**:
 
 ```yaml
-# docker-compose (n8n main service) — only the hook needs wiring; batch sync needs no mount.
+# docker-compose (n8n main service)
 environment:
   EXTERNAL_HOOK_FILES: /opt/n8n-sync/hook.cjs   # realtime export-on-save
   WORKFLOWS_DIR: /repo/workflows
   SCOPE_FILE: /repo/workflow-ids.json
 volumes:
-  - .:/repo                                                            # repo (workflows + scope)
-  - ./node_modules/@andreapalladiokiv/n8n-sync/dist:/opt/n8n-sync:ro   # hook (dist/hook.cjs + hook-impl.cjs)
+  - .:/repo                                                                               # repo (workflows + scope)
+  - ./node_modules/@andreapalladiokiv/n8n-sync/dist:/opt/n8n-sync:ro                      # hook (+hook-impl)
+  - ./node_modules/@andreapalladiokiv/n8n-sync/dist/n8n-cmd:/usr/local/lib/node_modules/n8n/dist/commands/n8n-sync:ro  # drop-in CLI commands
 ```
 
-Batch sync (host/CI) `docker cp`s the bundle into the container and runs it as a node script —
-**identical to 1.x**, no new mount:
-`docker exec -e WORKFLOWS_DIR=… -e SCOPE_FILE=… -e N8N_PROJECT_ID=… <container> node /path/n8n-sync.mjs import`.
+Batch sync from the host then `docker exec`s the in-container commands, e.g.
+`docker exec -e WORKFLOWS_DIR=… -e SCOPE_FILE=… <container> n8n n8n-sync:import`.
 
 ## Version coupling (read before upgrading n8n)
 
 2.x depends on n8n **internals** that are not a public API: the `@n8n/di` Container, the
-`DbConnection`/`WorkflowRepository`/`ImportService`/`ActiveWorkflowManager`/`ModuleRegistry` tokens,
-the `importWorkflows(…, {activeState})` signature, and the bootstrap sequence (reflect-metadata +
-`dist/config` + `loadModules`). Only the external-hook **event names** are stable. **Pin the n8n
-version and smoke-test on every upgrade.** Notes: `activeState:'fromJson'` activation requires `EXECUTIONS_MODE=queue` (or multi-main);
+`DbConnection`/`WorkflowRepository`/`ImportService`/`ActiveWorkflowManager` tokens, the
+`importWorkflows(…, {activeState})` signature, and the `CommandRegistry`'s dynamic-require dispatch.
+Only the external-hook **event names** are stable. **Pin the n8n version and smoke-test on every
+upgrade.** Notes: `activeState:'fromJson'` activation requires `EXECUTIONS_MODE=queue` (or multi-main);
 `ImportService` swallows activation errors (a workflow with missing credentials imports but stays
 inactive — fill creds, re-import).
 

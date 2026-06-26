@@ -53,30 +53,14 @@ function nreq(): NodeRequire { return (_req ??= createRequire(path.join(n8nRoot(
 /** require an n8n DEPENDENCY by specifier (e.g. '@n8n/di', '@n8n/db', 'zod') — n8n's own copy. */
 export function pkg(spec: string): any { return nreq()(spec); }
 
-/** require an n8n COMPILED module under <n8nRoot>/dist (e.g. 'services/import.service' or 'config').
- *  No extension is appended — Node resolves `<rel>.js` or `<rel>/index.js`. */
-export function dist(rel: string): any { return nreq()(path.join(n8nRoot(), 'dist', rel)); }
+/** require an n8n COMPILED module under <n8nRoot>/dist (e.g. 'services/import.service'). */
+export function dist(rel: string): any {
+  const p = path.join(n8nRoot(), 'dist', /\.[cm]?js$/.test(rel) ? rel : `${rel}.js`);
+  return nreq()(p);
+}
 
 /** n8n's process-wide DI Container singleton. */
 export function container(): any { return pkg('@n8n/di').Container; }
-
-/** Bootstrap n8n's runtime in a STANDALONE process (a `node n8n-sync.mjs <cmd>` invocation that
- *  did NOT come through n8n's bin → CommandRegistry). The long-running server already did all this,
- *  so the hook never needs it. Mirrors the minimum from bin/n8n + CommandRegistry.execute:
- *    reflect-metadata (DI decorator metadata) → load GlobalConfig → ModuleRegistry.loadModules()
- *    (some ImportService deps are module-provided). The engine then opens the DataSource + node
- *    types on demand. Idempotent. */
-let _booted = false;
-export async function bootstrap(): Promise<void> {
-  if (_booted) return;
-  const root = n8nRoot();
-  if (!process.env.NODE_CONFIG_DIR) process.env.NODE_CONFIG_DIR = path.join(root, 'config');
-  pkg('reflect-metadata');   // must load before any n8n decorated class is constructed
-  dist('config');            // populate n8n's GlobalConfig from env (+ config files) early
-  const { ModuleRegistry } = pkg('@n8n/backend-common');
-  await get(ModuleRegistry).loadModules();
-  _booted = true;
-}
 
 /** The LIVE DataSource — the running server's open connection, or freshly opened in a CLI
  *  process. `DbConnection.init()` is idempotent (guarded by its own connectionState). */

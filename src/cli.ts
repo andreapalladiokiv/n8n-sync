@@ -4,16 +4,13 @@ import { fileURLToPath } from 'node:url';
 import { Command } from 'commander';
 import { serializeWorkflow } from './normalize';
 import { walkWorkflowJson } from './fsutil';
-import { bootstrap } from './incontainer/bridge';
-import { runExport, runImport, runProjects, envConfig } from './incontainer/engine';
 
-// n8n-sync 2.x — ONE bundle, two roles:
-//   • HOST: `normalize` / `hook-path` (pure JSON, no n8n).
-//   • IN-CONTAINER: `export` / `import` / `projects` run as `docker exec <c> node n8n-sync.mjs <cmd>`
-//     (exactly as 1.x / the deploy did) — but now they reuse n8n's OWN DataSource + ImportService
-//     via the bridge (no bundled DB driver, no `n8n` CLI shell-out, no REST). `bootstrap()` brings
-//     up the minimum of n8n's runtime in this standalone process. Realtime export is the hook.
-// There are NO registered n8n commands (no dist/commands drop-in) — this bundle IS the entrypoint.
+// n8n-sync 2.x HOST CLI. The DB-touching work (export/import/projects + realtime export) now
+// runs INSIDE the n8n process via the drop-in commands `n8n n8n-sync:{export,import,projects}`
+// (dist/n8n-cmd/, mounted into n8n's dist/commands) and the external hook (dist/hook.cjs) — all
+// reusing n8n's own DataSource + ImportService, so this host bundle carries NO DB driver. What
+// remains host-side is pure JSON work: `normalize` (+ `hook-path` for EXTERNAL_HOOK_FILES wiring).
+// The consuming Makefile's `make export/import/projects` `docker exec`s the in-container commands.
 
 const VERSION = '2.0.0-alpha.1'; // keep in sync with package.json "version"
 
@@ -33,30 +30,16 @@ function runNormalize(files: string[], workflowsDir: string, dryRun: boolean): v
   if (changed === 0) process.stderr.write('all workflow JSON already canonical\n');
 }
 
-/** Run an in-container command: bootstrap n8n's runtime, run, then exit (the open DataSource pool
- *  keeps the event loop alive, so a standalone process won't drain on its own). */
-async function inContainer(run: () => Promise<number | void>): Promise<never> {
-  let rc = 0;
-  try {
-    await bootstrap();
-    rc = (await run()) || 0;
-  } catch (e) {
-    process.stderr.write(`n8n-sync: ${e instanceof Error ? (e.stack ?? e.message) : String(e)}\n`);
-    rc = 1;
-  }
-  process.exit(rc);
-}
-
 const program = new Command();
 program
   .name('n8n-sync')
-  .description('CI/CD sync for n8n workflows — host (normalize) + in-container (export/import/projects, run via `node n8n-sync.mjs <cmd>`)')
+  .description('CI/CD sync for n8n workflows — host side (normalize); export/import run in-container (`n8n n8n-sync:*`)')
   .version(VERSION, '--version', 'output the version number')
   .enablePositionalOptions()
   .showHelpAfterError();
 
 program.command('normalize [files...]')
-  .description('canonicalize workflow JSON in place (all under --workflows-dir if none given) [host]')
+  .description('canonicalize workflow JSON in place (all under --workflows-dir if none given)')
   .option('--workflows-dir <dir>', 'repo dir for workflow JSON [env WORKFLOWS_DIR]')
   .option('--dry-run', 'plan only; write nothing')
   .action((files: string[], opts: { workflowsDir?: string; dryRun?: boolean }) => {
@@ -64,23 +47,24 @@ program.command('normalize [files...]')
   });
 
 program.command('hook-path')
-  .description('print the path to the bundled n8n external hook (for EXTERNAL_HOOK_FILES) [host]')
+  .description('print the path to the bundled n8n external hook (for EXTERNAL_HOOK_FILES)')
   .action(() => {
     const dir = path.dirname(fileURLToPath(import.meta.url));
     process.stdout.write(`${path.join(dir, 'hook.cjs')}\n`);
   });
 
-program.command('export')
-  .description('n8n -> repo: export in-scope workflows, normalize, mirror folders [in-container]')
-  .action(() => inContainer(() => runExport(envConfig())));
-
-program.command('import')
-  .description('repo -> n8n: id-preserving import + folders + cycle-safe in-process activation [in-container]')
-  .action(() => inContainer(() => runImport(envConfig())));
-
-program.command('projects')
-  .description('list projects (id|name|type) to pick an N8N_PROJECT_ID [in-container]')
-  .action(() => inContainer(() => runProjects()));
+for (const moved of ['export', 'import', 'projects']) {
+  program.command(moved)
+    .description(`(moved) runs IN the n8n container in 2.x — use \`docker exec <n8n> n8n n8n-sync:${moved}\``)
+    .allowUnknownOption()
+    .action(() => {
+      process.stderr.write(
+        `n8n-sync 2.x: \`${moved}\` runs INSIDE the n8n container now — \`docker exec <container> n8n n8n-sync:${moved}\` ` +
+        `(reuses n8n's DataSource + services; no REST). The Makefile's \`make ${moved}\` wrapper does this.\n`,
+      );
+      process.exit(2);
+    });
+}
 
 program.parseAsync(process.argv).catch((err: unknown) => {
   process.stderr.write(`${err instanceof Error ? err.message : String(err)}\n`);
