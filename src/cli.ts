@@ -53,7 +53,7 @@ program.command('hook-path')
     process.stdout.write(`${path.join(dir, 'hook.cjs')}\n`);
   });
 
-for (const moved of ['export', 'import', 'projects', 'watch']) {
+for (const moved of ['export', 'import', 'projects']) {
   program.command(moved)
     .description(`(moved) runs IN the n8n container in 2.x — use \`docker exec <n8n> n8n n8n-sync:${moved}\``)
     .allowUnknownOption()
