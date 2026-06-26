@@ -1,6 +1,6 @@
 # n8n-sync (TypeScript engine)
 
-> **Status: `2.0.0-alpha.1`** — published to GitHub Packages as `@andreapalladiokiv/n8n-sync`.
+> **Status: `2.0.0-alpha`** — published to GitHub Packages as `@andreapalladiokiv/n8n-sync`.
 > **2.x is a clean break from 1.x**: instead of a self-contained bundle that opened its OWN
 > `@n8n/typeorm` DataSource and shelled out to the `n8n` CLI + REST API, 2.x runs **inside the n8n
 > process** and reuses n8n's OWN DataSource + services. No bundled DB driver, no `n8n` CLI
@@ -79,6 +79,15 @@ volumes:
 
 Batch sync from the host then `docker exec`s the in-container commands, e.g.
 `docker exec -e WORKFLOWS_DIR=… -e SCOPE_FILE=… <container> n8n n8n-sync:import`.
+
+### Registering the commands without the `dist/commands` mount (preload)
+
+If you'd rather not mount into n8n's `dist/commands`, set
+`NODE_OPTIONS=--require /opt/n8n-sync/preload.cjs` on the n8n service instead (sibling to
+`EXTERNAL_HOOK_FILES`). `dist/preload.cjs` registers the same `n8n-sync:{export,import,projects}`
+commands into n8n's `CommandMetadata` at process start — they appear in `n8n --help` and dispatch
+identically, with no `dist/commands` mount. (This is what the `n8n-va-workflows` consumer uses; an
+external hook itself cannot register commands — it loads after n8n's command lookup.)
 
 ## Version coupling (read before upgrading n8n)
 

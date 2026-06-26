@@ -12,7 +12,7 @@ import { walkWorkflowJson } from './fsutil';
 // remains host-side is pure JSON work: `normalize` (+ `hook-path` for EXTERNAL_HOOK_FILES wiring).
 // The consuming Makefile's `make export/import/projects` `docker exec`s the in-container commands.
 
-const VERSION = '2.0.0-alpha.1'; // keep in sync with package.json "version"
+const VERSION = '2.0.0-alpha'; // keep in sync with package.json "version"
 
 function runNormalize(files: string[], workflowsDir: string, dryRun: boolean): void {
   const targets = files.length ? files : walkWorkflowJson(workflowsDir);
