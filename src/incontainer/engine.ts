@@ -5,7 +5,7 @@ import { serializeWorkflow } from '../normalize';
 import { buildFolderPath } from '../folders';
 import { walkWorkflowJson, removeEmptyDirs } from '../fsutil';
 import { scopeIds } from '../config';
-import { credsOf, type Workflow, type Cred } from '../workflow';
+import { credsOf, tagName, type Workflow, type Cred } from '../workflow';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -163,6 +163,37 @@ async function seedCredentialStubs(ds: any, changedFiles: string[], projectId: s
   }
 }
 
+/** Link workflow tags by NAME (find-or-create tag_entity; reset workflows_tags per workflow). Our
+ *  normalized JSON stores tag NAMES (portable — tag ids differ per instance), but n8n's
+ *  ImportService expects tag ENTITIES with ids and would insert a NULL tagId. So we strip tags
+ *  before ImportService and link them here (mirrors the 1.x engine). */
+async function linkTagsByName(ds: any, tagNamesByWf: Map<string, string[]>): Promise<void> {
+  if (tagNamesByWf.size === 0) return;
+  const { generateNanoId } = bridge.repos();
+  const cache = new Map<string, string>(); // tag name → tag id
+  await ds.transaction(async (tx: any) => {
+    const resolveTag = async (name: string): Promise<string> => {
+      const hit = cache.get(name);
+      if (hit) return hit;
+      const rows = await tx.query('SELECT id FROM tag_entity WHERE name=$1 ORDER BY "createdAt", id LIMIT 1', [name]) as Array<{ id: string }>;
+      const existing = rows[0]?.id;
+      const id: string = existing ?? generateNanoId();
+      if (!existing) {
+        await tx.query('INSERT INTO tag_entity (id,name,"createdAt","updatedAt") VALUES ($1,$2,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)', [id, name]);
+      }
+      cache.set(name, id);
+      return id;
+    };
+    for (const [wfId, names] of tagNamesByWf) {
+      await tx.query('DELETE FROM workflows_tags WHERE "workflowId"=$1', [wfId]); // reset, then re-link from git
+      for (const name of names) {
+        const tagId = await resolveTag(name);
+        await tx.query('INSERT INTO workflows_tags ("workflowId","tagId") VALUES ($1,$2) ON CONFLICT DO NOTHING', [wfId, tagId]);
+      }
+    }
+  });
+}
+
 export async function runImport(cfg: EngineCfg): Promise<number> {
   const scope = new Set(scopeIds(cfg.scopeFile));
   const inScope = (id: string): boolean => scope.size === 0 || scope.has(id);
@@ -247,8 +278,13 @@ export async function runImport(cfg: EngineCfg): Promise<number> {
     // EXECUTIONS_MODE=queue). Missing-credential workflows import but stay inactive (logged).
     const { WorkflowRepository } = bridge.repos();
     const repo = bridge.get<any>(WorkflowRepository);
+    const tagNamesByWf = new Map<string, string[]>();
     const entities = changedFiles.map((f) => {
       const plain = readJson(f);
+      const id = path.basename(f, '.json');
+      // Strip tags (NAMES in our JSON) — ImportService needs tag ENTITIES with ids; we link by name below.
+      tagNamesByWf.set(id, (Array.isArray(plain.tags) ? plain.tags : []).map(tagName).filter((n: unknown): n is string => typeof n === 'string' && n.length > 0));
+      plain.tags = [];
       plain.parentFolderId = plain.parentFolderId ?? null;
       plain.isArchived = false; // restore archived; new/updated default to live
       const ent = repo.create(plain);
@@ -257,7 +293,8 @@ export async function runImport(cfg: EngineCfg): Promise<number> {
     });
     err(`==> Importing ${entities.length} changed workflow(s) via ImportService (activeState=fromJson) ...\n`);
     await bridge.importService().importWorkflows(entities, projectId, userId, { activeState: 'fromJson' });
-    err('==> ImportService done (upsert + tags + owner + activation in-process).\n');
+    await linkTagsByName(ds, tagNamesByWf);
+    err('==> ImportService done (upsert + owner + activation in-process); tags linked by name.\n');
   }
 
   // Orphans: owned by the project, in scope, gone from git → ARCHIVE (deactivate + isArchived),

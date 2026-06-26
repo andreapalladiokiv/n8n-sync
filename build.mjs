@@ -48,6 +48,20 @@ await build({
   legalComments: 'none',
 });
 
+// NODE_OPTIONS preload (CJS) — registers the n8n-sync CLI commands into n8n's CommandMetadata at
+// process start, so `n8n n8n-sync:*` work WITHOUT mounting a file into <n8nRoot>/dist/commands.
+// Wired by NODE_OPTIONS=--require=/opt/n8n-sync/preload.cjs (sibling to EXTERNAL_HOOK_FILES).
+await build({
+  entryPoints: ['src/incontainer/preload.ts'],
+  bundle: true,
+  platform: 'node',
+  format: 'cjs',
+  target: 'node18',
+  outfile: 'dist/preload.cjs',
+  minify: true,
+  legalComments: 'none',
+});
+
 // External hook (CJS) — in-process export-on-save, reusing n8n's DataSource via the bridge. The
 // logic bundles to dist/hook-impl.cjs (named exports); the committed shim becomes dist/hook.cjs
 // (the EXTERNAL_HOOK_FILES entrypoint) and assembles the n8n hook shape from it.
