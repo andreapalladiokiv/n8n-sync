@@ -1,6 +1,6 @@
 # n8n-sync (TypeScript engine)
 
-> **Status: `2.0.0-alpha`** — published to GitHub Packages as `@andreapalladiokiv/n8n-sync`.
+> **Status: `2.0.0`** (stable) — published to GitHub Packages as `@andreapalladiokiv/n8n-sync`.
 > **2.x is a clean break from 1.x**: instead of a self-contained bundle that opened its OWN
 > `@n8n/typeorm` DataSource and shelled out to the `n8n` CLI + REST API, 2.x runs **inside the n8n
 > process** and reuses n8n's OWN DataSource + services. No bundled DB driver, no `n8n` CLI
