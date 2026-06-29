@@ -57,8 +57,8 @@ Config is env-driven (flag-free in-container): `WORKFLOWS_DIR`, `SCOPE_FILE`, `N
 `dist/hook.cjs` (`EXTERNAL_HOOK_FILES`) fires on `workflow.afterCreate/afterUpdate/afterDelete`. It
 maintains `SCOPE_FILE` (add/rename/remove; absent = "all", never narrowed) and runs the **in-process**
 export, **debounced** (`N8N_SYNC_HOOK_DEBOUNCE_MS`, default 1500) and **serialized**. Needs a writable
-`WORKFLOWS_DIR`/`SCOPE_FILE`. `dist/hook.cjs` requires its sibling `dist/hook-impl.cjs` — mount the
-whole `dist/` dir, not the single file.
+`WORKFLOWS_DIR`/`SCOPE_FILE`. `dist/hook.cjs` is self-contained (one bundled file, no siblings), but
+mount the whole `dist/` dir anyway — `preload.cjs` and `n8n-cmd/` live there too.
 
 ## Deploying into n8n (consumer)
 
@@ -73,7 +73,7 @@ environment:
   SCOPE_FILE: /repo/workflow-ids.json
 volumes:
   - .:/repo                                                                               # repo (workflows + scope)
-  - ./node_modules/@andreapalladiokiv/n8n-sync/dist:/opt/n8n-sync:ro                      # hook (+hook-impl)
+  - ./node_modules/@andreapalladiokiv/n8n-sync/dist:/opt/n8n-sync:ro                      # hook.cjs + preload.cjs
   - ./node_modules/@andreapalladiokiv/n8n-sync/dist/n8n-cmd:/usr/local/lib/node_modules/n8n/dist/commands/n8n-sync:ro  # drop-in CLI commands
 ```
 

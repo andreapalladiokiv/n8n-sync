@@ -47,8 +47,8 @@ export function n8nRoot(): string {
   throw new Error('n8n-sync: could not locate the n8n install root (set N8N_DIR to override)');
 }
 
-let _req: NodeRequire | null = null;
-function nreq(): NodeRequire { return (_req ??= createRequire(path.join(n8nRoot(), 'package.json'))); }
+let _req: NodeJS.Require | null = null;
+function nreq(): NodeJS.Require { return (_req ??= createRequire(path.join(n8nRoot(), 'package.json'))); }
 
 /** require an n8n DEPENDENCY by specifier (e.g. '@n8n/di', '@n8n/db', 'zod') — n8n's own copy. */
 export function pkg(spec: string): any { return nreq()(spec); }
@@ -86,3 +86,6 @@ export function get<T = any>(token: any): T { return container().get(token) as T
 export const repos = () => pkg('@n8n/db');
 export const importService = (): any => get(dist('services/import.service').ImportService);
 export const activeWorkflowManager = (): any => get(dist('active-workflow-manager').ActiveWorkflowManager);
+/** n8n's resolved runtime config (DI singleton) — same object the stock commands read via
+ *  `Container.get(GlobalConfig)`. We use `.executions.mode` ('queue' | 'regular') to gate activation. */
+export const globalConfig = (): any => get(pkg('@n8n/config').GlobalConfig);

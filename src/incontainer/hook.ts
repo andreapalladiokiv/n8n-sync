@@ -9,10 +9,12 @@ import { makeDebouncedRunner } from './scheduler';
 // export — reusing n8n's OWN open DataSource via the bridge (NO subprocess, NO own DB connection,
 // NO `n8n` CLI), debounced + serialized (./scheduler).
 //
-// esbuild bundles this to dist/hook-impl.cjs (named exports). The committed dist/hook.cjs shim
-// assembles the n8n hook shape `{ workflow: { afterCreate:[…], … } }` from these — written that
-// way because n8n iterates the export's own keys, so esbuild's __esModule/default wrapping of an
-// `export default` would break the lookup.
+// esbuild bundles this STRAIGHT to dist/hook.cjs (the EXTERNAL_HOOK_FILES entrypoint) — no shim.
+// n8n's loader does `Object.entries(require(file))` (external-hooks.js:51), so the module's OWN
+// enumerable keys ARE the hook shape. We therefore export exactly one key, `workflow` (esbuild emits
+// a named export as an enumerable own prop; the `__esModule` marker it also adds is NON-enumerable,
+// so Object.entries skips it → n8n sees only `{ workflow }`). The onCreate/onUpdate/onDelete
+// handlers stay UNexported, or they'd surface as stray top-level "resources" in that iteration.
 
 const exporter = makeDebouncedRunner(
   () => runExport(envConfig()),
@@ -28,12 +30,12 @@ const dbg = (ev: string, w: any): void => {
   console.log(`[n8n-sync] ${ev} ${info}`);
 };
 
-export function onCreate(workflow: any): void {
+function onCreate(workflow: any): void {
   dbg('afterCreate', workflow);
   try { if (workflow?.id != null) addScope(String(workflow.id), workflow.name); } catch { /* non-fatal */ }
   exporter.schedule();
 }
-export function onUpdate(workflow: any): void {
+function onUpdate(workflow: any): void {
   dbg('afterUpdate', workflow);
   try {
     if (workflow?.id != null) {
@@ -44,7 +46,7 @@ export function onUpdate(workflow: any): void {
   } catch { /* non-fatal */ }
   exporter.schedule();
 }
-export function onDelete(workflowId: any): void {
+function onDelete(workflowId: any): void {
   dbg('afterDelete', workflowId);
   try {
     const id = typeof workflowId === 'string' ? workflowId : workflowId?.id;
@@ -52,3 +54,11 @@ export function onDelete(workflowId: any): void {
   } catch { /* non-fatal */ }
   exporter.schedule();
 }
+
+// The n8n external-hook shape — the file's ONLY export (see header). Event arg shapes per n8n's
+// WorkflowHooks: workflow.afterCreate/afterUpdate receive the workflow, afterDelete receives the id.
+export const workflow = {
+  afterCreate: [onCreate],
+  afterUpdate: [onUpdate],
+  afterDelete: [onDelete],
+};

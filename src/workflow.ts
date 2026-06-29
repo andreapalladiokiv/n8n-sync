@@ -26,8 +26,8 @@ export function tagName(t: unknown): string | undefined {
 export function credsOf(wf: Workflow, enabledOnly: boolean): Cred[] {
   const seen = new Set<string>();
   const out: Cred[] = [];
-  for (const n of wf.nodes ?? []) {
-    if (enabledOnly && n.disabled === true) continue;
+
+  for (const n of (wf.nodes ?? []).filter(n => !enabledOnly || !n.disabled)) {
     for (const [type, v] of Object.entries(n.credentials ?? {})) {
       if (v && v.id != null && !seen.has(v.id)) {
         seen.add(v.id);

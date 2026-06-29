@@ -1,5 +1,5 @@
 import { build } from 'esbuild';
-import { chmodSync, copyFileSync } from 'node:fs';
+import { chmodSync } from 'node:fs';
 
 // n8n-sync 2.x build. THREE artifacts, none of which bundles a DB driver — all DB work now runs
 // inside the n8n process against n8n's OWN DataSource + services (see src/incontainer/bridge.ts):
@@ -62,19 +62,18 @@ await build({
   legalComments: 'none',
 });
 
-// External hook (CJS) — in-process export-on-save, reusing n8n's DataSource via the bridge. The
-// logic bundles to dist/hook-impl.cjs (named exports); the committed shim becomes dist/hook.cjs
-// (the EXTERNAL_HOOK_FILES entrypoint) and assembles the n8n hook shape from it.
+// External hook (CJS) — in-process export-on-save, reusing n8n's DataSource via the bridge. Bundles
+// STRAIGHT to dist/hook.cjs (the EXTERNAL_HOOK_FILES entrypoint): hook.ts exports exactly one key,
+// `workflow`, which IS the n8n hook shape (n8n loads it via Object.entries(require(file))). No shim.
 await build({
   entryPoints: ['src/incontainer/hook.ts'],
   bundle: true,
   platform: 'node',
   format: 'cjs',
   target: 'node18',
-  outfile: 'dist/hook-impl.cjs',
+  outfile: 'dist/hook.cjs',
   minify: true,
   legalComments: 'none',
 });
-copyFileSync('src/incontainer/hook-shim.cjs', 'dist/hook.cjs');
 
-console.error(`built ${OUT} + dist/hook.cjs (+hook-impl) + dist/n8n-cmd/{export,import,projects}.js`);
+console.error(`built ${OUT} + dist/hook.cjs + dist/n8n-cmd/{export,import,projects}.js`);

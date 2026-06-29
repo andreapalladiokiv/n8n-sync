@@ -194,7 +194,26 @@ async function linkTagsByName(ds: any, tagNamesByWf: Map<string, string[]>): Pro
   });
 }
 
+/** Re-assert the queue-mode gate that the stock `import:workflow` command enforces
+ *  (import/workflow.js:71) but `ImportService` itself does NOT — we bypass the command and call the
+ *  service directly. Outside queue mode (multi-main is a SUBSET: it requires executions.mode==='queue'),
+ *  a freshly imported workflow's in-process `activateWorkflow` never propagates to the long-running
+ *  main, so the deploy would "succeed" (exit 0) while leaving workflows silently INACTIVE
+ *  (ImportService logs-and-swallows activation errors). Fail BEFORE touching the DB instead. */
+export function assertQueueMode(mode: string | undefined): void {
+  if (mode !== 'queue') {
+    throw new Error(
+      `n8n-sync: import requires n8n in queue mode (EXECUTIONS_MODE=queue, incl. multi-main), but it ` +
+      `is running in '${mode ?? 'regular'}' mode. In-process workflow activation does not take effect ` +
+      `there, so imported workflows would silently stay inactive. Aborting before any change.`,
+    );
+  }
+}
+
 export async function runImport(cfg: EngineCfg): Promise<number> {
+  // Mode gate — fail fast (before any FS/DB work) if this instance can't make activation stick.
+  // Same source of truth n8n itself reads: GlobalConfig.executions.mode (see assertQueueMode).
+  assertQueueMode(bridge.globalConfig().executions.mode);
   const scope = new Set(scopeIds(cfg.scopeFile));
   const inScope = (id: string): boolean => scope.size === 0 || scope.has(id);
   let files = walkWorkflowJson(cfg.workflowsDir).sort();
@@ -273,9 +292,9 @@ export async function runImport(cfg: EngineCfg): Promise<number> {
 
     // Hand the changed set to n8n's own ImportService: id-preserving upsert(['id']) + owner +
     // tags + WorkflowHistory + CYCLE-SAFE in-process activation (activeState:'fromJson' respects
-    // each workflow's `active`). No CLI, no REST. NB the queue-mode guard lives in the stock
-    // import:workflow command, not the service, so calling it directly is fine here (we verified
-    // EXECUTIONS_MODE=queue). Missing-credential workflows import but stay inactive (logged).
+    // each workflow's `active`). No CLI, no REST. The queue-mode guard the stock import:workflow
+    // command enforces lives in the command (not the service) — we re-assert it ourselves at the top
+    // of runImport (assertQueueMode). Missing-credential workflows import but stay inactive (logged).
     const { WorkflowRepository } = bridge.repos();
     const repo = bridge.get<any>(WorkflowRepository);
     const tagNamesByWf = new Map<string, string[]>();
