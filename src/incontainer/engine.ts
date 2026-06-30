@@ -298,6 +298,7 @@ export async function runImport(cfg: EngineCfg): Promise<number> {
     const { WorkflowRepository } = bridge.repos();
     const repo = bridge.get<any>(WorkflowRepository);
     const tagNamesByWf = new Map<string, string[]>();
+    const pfByWf = new Map<string, string | null>();
     const entities = changedFiles.map((f) => {
       const plain = readJson(f);
       const id = path.basename(f, '.json');
@@ -305,6 +306,7 @@ export async function runImport(cfg: EngineCfg): Promise<number> {
       tagNamesByWf.set(id, (Array.isArray(plain.tags) ? plain.tags : []).map(tagName).filter((n: unknown): n is string => typeof n === 'string' && n.length > 0));
       plain.tags = [];
       plain.parentFolderId = plain.parentFolderId ?? null;
+      pfByWf.set(id, plain.parentFolderId);
       plain.isArchived = false; // restore archived; new/updated default to live
       const ent = repo.create(plain);
       ent.versionMetadata = plain.versionMetadata ?? null;
@@ -313,7 +315,16 @@ export async function runImport(cfg: EngineCfg): Promise<number> {
     err(`==> Importing ${entities.length} changed workflow(s) via ImportService (activeState=fromJson) ...\n`);
     await bridge.importService().importWorkflows(entities, projectId, userId, { activeState: 'fromJson' });
     await linkTagsByName(ds, tagNamesByWf);
-    err('==> ImportService done (upsert + owner + activation in-process); tags linked by name.\n');
+    // ImportService's WorkflowEntity upsert does NOT persist parentFolderId — the SAME n8n ORM gap
+    // that forces loadWorkflows() to overlay it via raw SQL on export (see the SELECT at the top).
+    // Re-assert each workflow's folder placement directly (the folders themselves were upserted
+    // above), so the import↔export round-trip preserves the folder tree instead of flattening it.
+    await ds.transaction(async (tx: any) => {
+      for (const [id, pf] of pfByWf) {
+        await tx.query('UPDATE workflow_entity SET "parentFolderId"=$1 WHERE id=$2', [pf, id]);
+      }
+    });
+    err('==> ImportService done (upsert + owner + activation in-process); tags linked by name; parentFolderId re-asserted.\n');
   }
 
   // Orphans: owned by the project, in scope, gone from git → ARCHIVE (deactivate + isArchived),
