@@ -5346,7 +5346,6 @@
     ]
   },
   "settings": {
-    "availableInMCP": false,
     "binaryMode": "separate",
     "callerPolicy": "any",
     "errorWorkflow": "zs5YDRv84urjCKo9",

@@ -6,6 +6,11 @@
 // (test/normalize.parity.test.mjs) pins this against jq-generated goldens on the
 // real workflow corpus. Validated 10/10 incl. float rendering; the one known
 // theoretical gap is pathological numbers (1e21, -0), which the test guards.
+//
+// Two intentional post-bash divergences (both instance-specific noise the jq form
+// left in): node credential-reference `name` (stripped per-node) and
+// `settings.availableInMCP` (an instance-side MCP-exposure toggle). Neither appears in
+// the parity fixtures, so the goldens are unchanged.
 
 /** Volatile / instance-specific fields stripped before committing. */
 const DELETE_FIELDS = [
@@ -31,7 +36,13 @@ export function normalizeWorkflow(input: Workflow): Workflow {
   // jq `unique` = sort + dedupe. Tags are reduced to their names first.
   const tags = (Array.isArray(w.tags) ? w.tags : []).map(tagName);
   w.tags = [...new Set(tags)].sort();
-  w.settings = w.settings ?? {};
+  // `settings.availableInMCP` is an instance-side toggle (whether the workflow is exposed
+  // via the MCP Server Trigger). It's UI/runtime state, not part of the portable workflow
+  // definition, and flips between instances (false↔true), so it perpetually diffs — strip
+  // it while preserving every other real setting. NB: key is uppercase `MCP`.
+  const settings = { ...((w.settings as Record<string, unknown>) ?? {}) };
+  delete settings.availableInMCP;
+  w.settings = settings;
   // A node credential reference is `{ id, name }`, but `name` is the credential's
   // DISPLAY label on whatever instance the workflow was exported from — the same id is
   // named differently on each instance, so it perpetually diffs (and isn't portable).

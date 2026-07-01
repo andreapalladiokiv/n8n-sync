@@ -1,6 +1,6 @@
 {
   "name": "@andreapalladiokiv/n8n-sync",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "CI/CD sync for n8n workflows — TypeScript engine. 2.x runs INSIDE the n8n process (drop-in CLI commands + external hook) reusing n8n's own DataSource + ImportService (no bundled DB driver, no REST activation); host side does pure JSON normalize.",
   "type": "module",
   "repository": {

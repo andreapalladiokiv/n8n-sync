@@ -3,8 +3,10 @@
 // legacy bash engine's `jq -S "$NORMALIZE_JQ"` output and now additionally have node
 // credential-reference `name` fields stripped — an intentional post-bash change so
 // workflows stay portable + stable across instances (the same credential id is named
-// differently on each one). Runs the REAL artifact (dist/n8n-sync.mjs), so it guards the
-// build too. (`name`-stripping is also covered directly in unit/normalize.test.ts.)
+// differently on each one). `settings.availableInMCP` (an instance-side MCP-exposure
+// toggle) is likewise stripped; neither field appears in these fixtures, so the goldens
+// are unchanged by either strip. Runs the REAL artifact (dist/n8n-sync.mjs), so it guards
+// the build too. (Both strips are also covered directly in unit/normalize.test.ts.)
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';

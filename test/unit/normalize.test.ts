@@ -49,6 +49,27 @@ test('normalizeWorkflow strips credential-reference name (instance-specific), ke
   assert.equal('credentials' in nodes[2], false, 'node without creds untouched');
 });
 
+test('normalizeWorkflow strips settings.availableInMCP, keeps other settings', () => {
+  const w = normalizeWorkflow({
+    settings: { availableInMCP: true, executionOrder: 'v1', callerPolicy: 'any', errorWorkflow: 'zs5YDRv84urjCKo9' },
+  });
+  const settings = w.settings as Record<string, unknown>;
+  assert.equal('availableInMCP' in settings, false, 'availableInMCP dropped');
+  assert.deepEqual(settings, { executionOrder: 'v1', callerPolicy: 'any', errorWorkflow: 'zs5YDRv84urjCKo9' }, 'other settings kept');
+});
+
+test('normalizeWorkflow: missing settings still defaults to {} (no availableInMCP)', () => {
+  const w = normalizeWorkflow({});
+  assert.deepEqual(w.settings, {}, 'settings defaults to empty object');
+});
+
+test('normalizeWorkflow does not mutate input settings', () => {
+  const input = { settings: { availableInMCP: true, executionOrder: 'v1' } };
+  const before = JSON.stringify(input);
+  normalizeWorkflow(input);
+  assert.equal(JSON.stringify(input), before, 'input must not be mutated');
+});
+
 test('normalizeWorkflow does not mutate input node credentials', () => {
   const input = { nodes: [{ credentials: { openAiApi: { id: 'abc', name: 'X' } } }] };
   const before = JSON.stringify(input);
