@@ -86,6 +86,21 @@ export function get<T = any>(token: any): T { return container().get(token) as T
 export const repos = () => pkg('@n8n/db');
 export const importService = (): any => get(dist('services/import.service').ImportService);
 export const activeWorkflowManager = (): any => get(dist('active-workflow-manager').ActiveWorkflowManager);
+/** n8n 2.x publishes a workflow through an outbox: a row is enqueued, a consumer in the LONG-RUNNING
+ *  process applies it, and the webhook/trigger registrations follow. `ImportService` writes the
+ *  workflow and advances its active version but never enqueues, so an imported active workflow keeps
+ *  serving its old registration — or none at all. The periodic reconciler does not heal it either:
+ *  findMissingActiveWorkflows() only inspects NON-webhook triggers.
+ *
+ *  We enqueue and stop there. Applying it ourselves is not an option: this runs as a short-lived
+ *  `n8n` CLI process where the publication service is not started, and asking it to apply throws
+ *  "WorkflowTriggerActivator requires workflow publication service to be enabled". Writing the row is
+ *  the whole contract of an outbox — the running main and webhook processes are the readers. */
+export const publicationOutbox = (): any => get(repos().WorkflowPublicationOutboxRepository);
+/** The same entry point the UI's publish button and enterprise source-control's git import both use.
+ *  Prefer it over ActiveWorkflowManager: it detects webhook-path conflicts, records publish history,
+ *  picks 'activate' vs 'update' correctly, and branches on the publication-service flag itself. */
+export const workflowService = (): any => get(dist('workflows/workflow.service').WorkflowService);
 /** n8n's resolved runtime config (DI singleton) — same object the stock commands read via
  *  `Container.get(GlobalConfig)`. We use `.executions.mode` ('queue' | 'regular') to gate activation. */
 export const globalConfig = (): any => get(pkg('@n8n/config').GlobalConfig);

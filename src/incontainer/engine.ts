@@ -315,6 +315,7 @@ export async function runImport(cfg: EngineCfg): Promise<number> {
     const { WorkflowRepository } = bridge.repos();
     const repo = bridge.get<any>(WorkflowRepository);
     const tagNamesByWf = new Map<string, string[]>();
+    const activeChanged: string[] = [];
     const pfByWf = new Map<string, string | null>();
     const entities = changedFiles.map((f) => {
       const plain = readJson(f);
@@ -324,6 +325,9 @@ export async function runImport(cfg: EngineCfg): Promise<number> {
       plain.tags = [];
       plain.parentFolderId = plain.parentFolderId ?? null;
       pfByWf.set(id, plain.parentFolderId);
+      // Read activity off the JSON, not off the created entity: repo.create() does not
+      // carry `active` through, so filtering the entities afterwards finds none.
+      if (plain.active === true) activeChanged.push(id);
       plain.isArchived = false; // restore archived; new/updated default to live
       // Preserve the instance-side MCP-exposure toggle: normalize strips settings.availableInMCP from
       // git (it flips per instance and isn't portable), so the JSON never carries it. Re-inject the
@@ -348,6 +352,51 @@ export async function runImport(cfg: EngineCfg): Promise<number> {
       }
     });
     err('==> ImportService done (upsert + owner + activation in-process); tags linked by name; parentFolderId re-asserted.\n');
+
+    // Re-activate what we just changed, or an active workflow keeps its OLD registration.
+    //
+    // ImportService writes the workflow and advances its active version, but nothing tells the
+    // processes that serve triggers. So a changed workflow stays `active: true`, gets a fresh
+    // `activeVersionId`, logs nothing wrong — and answers 404 on its production webhook. In queue mode
+    // the webhook process is a separate container, which is where it shows. Toggling it in the UI fixes
+    // it, which is the tell: activation is a side effect, not a column.
+    //
+    // Go through WorkflowService.activateWorkflow — the same call the UI's publish button makes and
+    // the one enterprise source-control uses after a git import (source-control-import.service.ee:
+    // publishWorkflow → workflowService.activateWorkflow). Reaching for ActiveWorkflowManager directly
+    // skips webhook-conflict detection, publish history and the activate-vs-update distinction, and
+    // hard-codes a choice that activateWorkflow makes for us: with
+    // `workflows.useWorkflowPublicationService` on it publishes via the outbox, off it goes through
+    // ActiveWorkflowManager.
+    //
+    // Only ACTIVE workflows need it: an inactive one has nothing registered to go stale.
+    if (activeChanged.length > 0) {
+      err(`==> Re-activating ${activeChanged.length} imported active workflow(s) so their triggers and webhooks follow ...\n`);
+      const { UserRepository } = bridge.repos();
+      const user = await bridge.get<any>(UserRepository).findOne({ where: { id: userId }, relations: ['role'] });
+      let done = 0;
+      const failures: string[] = [];
+      if (!user) {
+        failures.push(`owner user ${userId} not found`);
+      } else {
+        const ws = bridge.workflowService();
+        for (const id of activeChanged) {
+          // No versionId: activateWorkflow falls back to the workflow's current versionId, which is
+          // the definition we just imported — exactly what we want published.
+          try { await ws.activateWorkflow(user, id); done++; }
+          catch (e: any) { failures.push(`${id}: ${e?.message ?? e}`); }
+        }
+      }
+      // Loud, never fatal. The import itself landed, so exiting non-zero would fail a deploy that did
+      // apply; staying quiet would ship a workflow answering 404. Say which ones need a hand.
+      if (failures.length > 0) {
+        err(`n8n-sync: WARNING re-activated ${done}/${activeChanged.length}. The rest are in the database ` +
+            `but may still serve their previous version — toggle them in the UI:\n`);
+        for (const f of failures.slice(0, 10)) err(`  ! ${f}\n`);
+      } else {
+        err(`==> Re-activated ${done} workflow(s).\n`);
+      }
+    }
   }
 
   // Names in SCOPE_FILE follow git after an import (a git-side rename never fires the
